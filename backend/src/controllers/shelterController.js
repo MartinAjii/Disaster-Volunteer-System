@@ -46,7 +46,7 @@ const createShelter = asyncHandler(async (req, res) => {
 
 const getShelters = asyncHandler(async (req, res) => {
   const [rows] = await pool.execute(
-    'SELECT * FROM shelters ORDER BY id DESC'
+    'SELECT * FROM shelters ORDER BY id ASC'
   );
 
   res.json({

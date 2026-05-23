@@ -61,7 +61,7 @@ const getDisasters = asyncHandler(async (req, res) => {
     params.push(severity);
   }
 
-  sql += ' ORDER BY disaster_date DESC, id DESC';
+  sql += ' ORDER BY id ASC';
 
   const [rows] = await pool.execute(sql, params);
 

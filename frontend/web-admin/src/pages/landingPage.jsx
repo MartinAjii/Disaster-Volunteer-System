@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AUTH_URL } from "../services/api";
 
 function LandingPage() {
-  const AUTH_URL = "http://localhost:3001";
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("login");
