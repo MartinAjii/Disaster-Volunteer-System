@@ -1,96 +1,83 @@
 import { useState } from 'react'
-
-import '../../styles/admin/dashboardAdmin.css'
-import '../../styles/admin/sidebar.css'
-import '../../styles/admin/topbar.css'
-import '../../styles/admin/statCard.css'
-import '../../styles/admin/table.css'
+import '../../index.css'
 
 const DashboardAdmin = () => {
   const [activeSection, setActiveSection] = useState('dashboard')
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
+
+  const menus = [
+    { key: 'dashboard',   icon: 'fas fa-chart-line', label: 'Dashboard' },
+    { key: 'volunteers',  icon: 'fas fa-users',       label: 'Volunteers' },
+    { key: 'disasters',   icon: 'fas fa-fire',        label: 'Disasters' },
+    { key: 'shelters',    icon: 'fas fa-home',        label: 'Shelters' },
+    { key: 'assignments', icon: 'fas fa-tasks',       label: 'Assignments' },
+  ];
+
+  const sectionTitles = {
+    dashboard: { title: 'Dashboard', sub: 'Ringkasan data sistem' },
+    volunteers: { title: 'Volunteer Management', sub: 'Kelola data relawan' },
+    disasters: { title: 'Disaster Reports', sub: 'Data laporan bencana' },
+    shelters: { title: 'Shelter Management', sub: 'Data tempat pengungsian' },
+    assignments: { title: 'Assignments', sub: 'Penugasan relawan' },
+  };
+
   return (
     <>
       {/* SIDEBAR */}
-      <div className='sidebar'>
-        <div className='brand'>
-          <i className='fas fa-hands-helping me-2'></i>
-          Disaster Admin
+      <div className="sidebar">
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">
+            <i className="fas fa-hands-helping"></i>
+          </div>
+          <div>
+            <div className="sidebar-logo-text">DVN Admin</div>
+            <div className="sidebar-logo-sub">Disaster Volunteer Network</div>
+          </div>
         </div>
 
-        <nav className='mt-4'>
-          <button
-            className={`nav-link ${
-              activeSection === 'dashboard' ? 'active' : ''
-            }`}
-            onClick={() => setActiveSection('dashboard')}
-          >
-            <i className='fas fa-chart-line me-2'></i>
-            Dashboard
-          </button>
+        <nav className="sidebar-nav">
+          <div className="sidebar-section-label">Menu Utama</div>
+          {menus.map((menu) => (
+            <button
+              key={menu.key}
+              className={`nav-link ${activeSection === menu.key ? 'active' : ''}`}
+              onClick={() => setActiveSection(menu.key)}
+            >
+              <i className={menu.icon}></i>
+              {menu.label}
+            </button>
+          ))}
 
-          <button
-            className={`nav-link ${
-              activeSection === 'volunteers' ? 'active' : ''
-            }`}
-            onClick={() => setActiveSection('volunteers')}
-          >
-            <i className='fas fa-users me-2'></i>
-            Volunteers
-          </button>
+          <div className="sidebar-divider" />
 
-          <button
-            className={`nav-link ${
-              activeSection === 'disasters' ? 'active' : ''
-            }`}
-            onClick={() => setActiveSection('disasters')}
-          >
-            <i className='fas fa-fire me-2'></i>
-            Disasters
-          </button>
-
-          <button
-            className={`nav-link ${
-              activeSection === 'shelters' ? 'active' : ''
-            }`}
-            onClick={() => setActiveSection('shelters')}
-          >
-            <i className='fas fa-home me-2'></i>
-            Shelters
-          </button>
-
-          <button
-            className={`nav-link ${
-              activeSection === 'assignments' ? 'active' : ''
-            }`}
-            onClick={() => setActiveSection('assignments')}
-          >
-            <i className='fas fa-tasks me-2'></i>
-            Assignments
-          </button>
-
-          <hr className='sidebar-divider' />
-
-          <button className='nav-link text-danger'>
-            <i className='fas fa-sign-out-alt me-2'></i>
+          <button className="nav-link logout-link" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i>
             Logout
           </button>
         </nav>
       </div>
 
       {/* MAIN CONTENT */}
-      <div className='main-content'>
+      <div className="main-content">
         {/* TOPBAR */}
-        <div className='topbar'>
+        <div className="topbar">
           <div>
-            <h3 className='fw-bold mb-1'>Dashboard Admin</h3>
-            <small>Disaster Volunteer Network System</small>
+            <div className="topbar-title">{sectionTitles[activeSection]?.title}</div>
+            <div className="topbar-sub">{sectionTitles[activeSection]?.sub}</div>
           </div>
-
-          <div>
-            <button className='btn btn-danger'>
-              <i className='fas fa-bell me-2'></i>
-              Alerts
+          <div className="topbar-actions">
+            <button className="btn btn-ghost btn-sm">
+              <i className="fas fa-bell"></i>
+              Notifikasi
+            </button>
+            <button className="btn btn-logout btn-sm" onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt"></i>
+              Logout
             </button>
           </div>
         </div>
@@ -98,74 +85,75 @@ const DashboardAdmin = () => {
         {/* DASHBOARD */}
         {activeSection === 'dashboard' && (
           <>
-            <div className='row g-4'>
-              <div className='col-md-3'>
-                <div className='stat-card'>
-                  <div className='d-flex justify-content-between align-items-center'>
+            <div className="row g-4">
+              <div className="col-md-3">
+                <div className="stat-card">
+                  <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <p className='text-white-50 mb-1'>Volunteers</p>
-                      <h2 className='stat-number'>124</h2>
+                      <div className="stat-card-label">Volunteers</div>
+                      <div className="stat-number">124</div>
                     </div>
-
-                    <i className='fas fa-users fa-2x text-danger'></i>
+                    <div className="stat-card-icon red">
+                      <i className="fas fa-users"></i>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className='col-md-3'>
-                <div className='stat-card blue'>
-                  <div className='d-flex justify-content-between align-items-center'>
+              <div className="col-md-3">
+                <div className="stat-card blue">
+                  <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <p className='text-white-50 mb-1'>Disasters</p>
-                      <h2 className='stat-number'>18</h2>
+                      <div className="stat-card-label">Disasters</div>
+                      <div className="stat-number">18</div>
                     </div>
-
-                    <i className='fas fa-fire fa-2x text-info'></i>
+                    <div className="stat-card-icon blue">
+                      <i className="fas fa-fire"></i>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className='col-md-3'>
-                <div className='stat-card green'>
-                  <div className='d-flex justify-content-between align-items-center'>
+              <div className="col-md-3">
+                <div className="stat-card green">
+                  <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <p className='text-white-50 mb-1'>Shelters</p>
-                      <h2 className='stat-number'>42</h2>
+                      <div className="stat-card-label">Shelters</div>
+                      <div className="stat-number">42</div>
                     </div>
-
-                    <i className='fas fa-home fa-2x text-success'></i>
+                    <div className="stat-card-icon green">
+                      <i className="fas fa-home"></i>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className='col-md-3'>
-                <div className='stat-card orange'>
-                  <div className='d-flex justify-content-between align-items-center'>
+              <div className="col-md-3">
+                <div className="stat-card orange">
+                  <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <p className='text-white-50 mb-1'>Assignments</p>
-                      <h2 className='stat-number'>67</h2>
+                      <div className="stat-card-label">Assignments</div>
+                      <div className="stat-number">67</div>
                     </div>
-
-                    <i className='fas fa-tasks fa-2x text-warning'></i>
+                    <div className="stat-card-icon orange">
+                      <i className="fas fa-tasks"></i>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* RECENT DISASTER */}
-            <div className='card border-0 shadow-sm mt-4'>
-              <div className='card-body'>
-                <div className='d-flex justify-content-between align-items-center mb-4'>
-                  <h5 className='fw-bold'>Recent Disaster Reports</h5>
-
-                  <button className='btn btn-primary'>
-                    <i className='fas fa-plus me-2'></i>
+            <div className="card shadow-sm mt-4">
+              <div className="card-body" style={{ padding: '24px' }}>
+                <div className="card-header-row">
+                  <div className="card-title">Recent Disaster Reports</div>
+                  <button className="btn btn-primary btn-sm">
+                    <i className="fas fa-plus"></i>
                     Add Report
                   </button>
                 </div>
-
-                <div className='table-responsive'>
-                  <table className='table align-middle'>
+                <div className="table-responsive">
+                  <table className="table">
                     <thead>
                       <tr>
                         <th>Location</th>
@@ -174,36 +162,18 @@ const DashboardAdmin = () => {
                         <th>Status</th>
                       </tr>
                     </thead>
-
                     <tbody>
                       <tr>
                         <td>Bandung</td>
                         <td>Flood</td>
-                        <td>
-                          <span className='badge bg-danger'>
-                            Critical
-                          </span>
-                        </td>
-                        <td>
-                          <span className='badge bg-success'>
-                            Active
-                          </span>
-                        </td>
+                        <td><span className="badge bg-danger">Critical</span></td>
+                        <td><span className="badge bg-success">Active</span></td>
                       </tr>
-
                       <tr>
                         <td>Jakarta</td>
                         <td>Earthquake</td>
-                        <td>
-                          <span className='badge bg-warning text-dark'>
-                            Medium
-                          </span>
-                        </td>
-                        <td>
-                          <span className='badge bg-success'>
-                            Active
-                          </span>
-                        </td>
+                        <td><span className="badge bg-warning">Medium</span></td>
+                        <td><span className="badge bg-success">Active</span></td>
                       </tr>
                     </tbody>
                   </table>
@@ -215,41 +185,59 @@ const DashboardAdmin = () => {
 
         {/* VOLUNTEERS */}
         {activeSection === 'volunteers' && (
-          <div className='card border-0 shadow-sm mt-4'>
-            <div className='card-body'>
-              <div className='d-flex justify-content-between align-items-center mb-4'>
-                <h5 className='fw-bold'>Volunteer Management</h5>
-
-                <button className='btn btn-primary'>
-                  <i className='fas fa-user-plus me-2'></i>
+          <div className="card shadow-sm">
+            <div className="card-body" style={{ padding: '24px' }}>
+              <div className="card-header-row">
+                <div className="card-title">Volunteer Management</div>
+                <button className="btn btn-primary btn-sm">
+                  <i className="fas fa-user-plus"></i>
                   Add Volunteer
                 </button>
               </div>
-
-              <div className='table-responsive'>
-                <table className='table align-middle'>
+              <div className="table-responsive">
+                <table className="table">
                   <thead>
                     <tr>
                       <th>Name</th>
                       <th>Email</th>
                       <th>Phone</th>
                       <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
-
                   <tbody>
                     <tr>
                       <td>John Doe</td>
                       <td>john@gmail.com</td>
                       <td>08123456789</td>
+                      <td><span className="badge bg-success">Active</span></td>
                       <td>
-                        <span className='badge bg-success'>
-                          Active
-                        </span>
+                        <button className="btn btn-ghost btn-sm">
+                          <i className="fas fa-edit"></i>
+                        </button>
                       </td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Other sections */}
+        {['disasters','shelters','assignments'].includes(activeSection) && (
+          <div className="card shadow-sm">
+            <div className="card-body" style={{ padding: '24px' }}>
+              <div className="card-header-row">
+                <div className="card-title">{sectionTitles[activeSection]?.title}</div>
+                <button className="btn btn-primary btn-sm">
+                  <i className="fas fa-plus"></i>
+                  Tambah
+                </button>
+              </div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '32px 0', textAlign: 'center' }}>
+                <i className="fas fa-inbox" style={{ fontSize: 32, marginBottom: 12, display: 'block', opacity: 0.3 }}></i>
+                Tidak ada data untuk ditampilkan
               </div>
             </div>
           </div>

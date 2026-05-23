@@ -1,19 +1,29 @@
-const Topbar = () => {
+const Topbar = ({ title = "Dashboard Admin", subtitle = "Disaster Volunteer Network System" }) => {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
+
   return (
-    <div className='topbar'>
+    <div className="topbar">
       <div>
-        <h4 className='mb-0'>Admin Dashboard</h4>
-        <small>Disaster Volunteer Network</small>
+        <div className="topbar-title">{title}</div>
+        <div className="topbar-sub">{subtitle}</div>
       </div>
 
-      <div>
-        <button className='btn btn-danger'>
-          <i className='fas fa-sign-out-alt me-2'></i>
+      <div className="topbar-actions">
+        <button className="btn btn-ghost btn-sm">
+          <i className="fas fa-bell"></i>
+          Notifikasi
+        </button>
+        <button className="btn btn-logout btn-sm" onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt"></i>
           Logout
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Topbar
+export default Topbar;

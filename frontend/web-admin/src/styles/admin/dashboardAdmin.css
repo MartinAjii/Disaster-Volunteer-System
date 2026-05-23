@@ -1,15 +1,1 @@
-body {
-  background: #0f1923;
-  color: #e0e0e0;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.main-content {
-  margin-left: 250px;
-  padding: 2rem;
-}
-
-.card {
-  background: #141e2b !important;
-  color: white;
-}
+/* styles moved to index.css */
