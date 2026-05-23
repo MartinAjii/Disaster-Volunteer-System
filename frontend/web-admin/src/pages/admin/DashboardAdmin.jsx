@@ -1,13 +1,16 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../index.css'
 
 const DashboardAdmin = () => {
+  const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState('dashboard')
 
+  // Logout hanya dipanggil dari Sidebar — satu tempat
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/";
+    navigate("/", { replace: true });
   };
 
   const menus = [
@@ -19,12 +22,14 @@ const DashboardAdmin = () => {
   ];
 
   const sectionTitles = {
-    dashboard: { title: 'Dashboard', sub: 'Ringkasan data sistem' },
-    volunteers: { title: 'Volunteer Management', sub: 'Kelola data relawan' },
-    disasters: { title: 'Disaster Reports', sub: 'Data laporan bencana' },
-    shelters: { title: 'Shelter Management', sub: 'Data tempat pengungsian' },
-    assignments: { title: 'Assignments', sub: 'Penugasan relawan' },
+    dashboard:   { title: 'Dashboard',            sub: 'Ringkasan data sistem' },
+    volunteers:  { title: 'Volunteer Management', sub: 'Kelola data relawan' },
+    disasters:   { title: 'Disaster Reports',     sub: 'Data laporan bencana' },
+    shelters:    { title: 'Shelter Management',   sub: 'Data tempat pengungsian' },
+    assignments: { title: 'Assignments',          sub: 'Penugasan relawan' },
   };
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   return (
     <>
@@ -55,6 +60,7 @@ const DashboardAdmin = () => {
 
           <div className="sidebar-divider" />
 
+          {/* LOGOUT: hanya satu, di sidebar */}
           <button className="nav-link logout-link" onClick={handleLogout}>
             <i className="fas fa-sign-out-alt"></i>
             Logout
@@ -64,7 +70,7 @@ const DashboardAdmin = () => {
 
       {/* MAIN CONTENT */}
       <div className="main-content">
-        {/* TOPBAR */}
+        {/* TOPBAR — tanpa tombol logout */}
         <div className="topbar">
           <div>
             <div className="topbar-title">{sectionTitles[activeSection]?.title}</div>
@@ -75,10 +81,12 @@ const DashboardAdmin = () => {
               <i className="fas fa-bell"></i>
               Notifikasi
             </button>
-            <button className="btn btn-logout btn-sm" onClick={handleLogout}>
-              <i className="fas fa-sign-out-alt"></i>
-              Logout
-            </button>
+            <div className="navbar-user-chip">
+              <div className="navbar-avatar">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              {user?.name || "Admin"}
+            </div>
           </div>
         </div>
 
@@ -99,7 +107,6 @@ const DashboardAdmin = () => {
                   </div>
                 </div>
               </div>
-
               <div className="col-md-3">
                 <div className="stat-card blue">
                   <div className="d-flex justify-content-between align-items-center">
@@ -113,7 +120,6 @@ const DashboardAdmin = () => {
                   </div>
                 </div>
               </div>
-
               <div className="col-md-3">
                 <div className="stat-card green">
                   <div className="d-flex justify-content-between align-items-center">
@@ -127,7 +133,6 @@ const DashboardAdmin = () => {
                   </div>
                 </div>
               </div>
-
               <div className="col-md-3">
                 <div className="stat-card orange">
                   <div className="d-flex justify-content-between align-items-center">
@@ -156,22 +161,17 @@ const DashboardAdmin = () => {
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>Location</th>
-                        <th>Type</th>
-                        <th>Severity</th>
-                        <th>Status</th>
+                        <th>Location</th><th>Type</th><th>Severity</th><th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td>Bandung</td>
-                        <td>Flood</td>
+                        <td>Bandung</td><td>Flood</td>
                         <td><span className="badge bg-danger">Critical</span></td>
                         <td><span className="badge bg-success">Active</span></td>
                       </tr>
                       <tr>
-                        <td>Jakarta</td>
-                        <td>Earthquake</td>
+                        <td>Jakarta</td><td>Earthquake</td>
                         <td><span className="badge bg-warning">Medium</span></td>
                         <td><span className="badge bg-success">Active</span></td>
                       </tr>
@@ -197,25 +197,13 @@ const DashboardAdmin = () => {
               <div className="table-responsive">
                 <table className="table">
                   <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Phone</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
+                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>John Doe</td>
-                      <td>john@gmail.com</td>
-                      <td>08123456789</td>
+                      <td>John Doe</td><td>john@gmail.com</td><td>08123456789</td>
                       <td><span className="badge bg-success">Active</span></td>
-                      <td>
-                        <button className="btn btn-ghost btn-sm">
-                          <i className="fas fa-edit"></i>
-                        </button>
-                      </td>
+                      <td><button className="btn btn-ghost btn-sm"><i className="fas fa-edit"></i></button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -225,7 +213,7 @@ const DashboardAdmin = () => {
         )}
 
         {/* Other sections */}
-        {['disasters','shelters','assignments'].includes(activeSection) && (
+        {['disasters', 'shelters', 'assignments'].includes(activeSection) && (
           <div className="card shadow-sm">
             <div className="card-body" style={{ padding: '24px' }}>
               <div className="card-header-row">

@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
   const AUTH_URL = "http://localhost:3001";
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("login");
   const [alert, setAlert] = useState({ message: "", type: "danger" });
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const showAlert = (message, type = "danger") => setAlert({ message, type });
 
@@ -16,9 +19,18 @@ function LandingPage() {
     return "fas fa-exclamation-circle";
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (token && user) {
+      navigate(user.role === "admin" ? "/admin/dashboard" : "/user/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogin = async () => {
     const { email, password } = loginData;
     if (!email || !password) return showAlert("Email dan password wajib diisi.");
+    setLoading(true);
     try {
       const res = await fetch(`${AUTH_URL}/login`, {
         method: "POST",
@@ -29,18 +41,21 @@ function LandingPage() {
       if (data.success) {
         localStorage.setItem("token", data.data.token);
         localStorage.setItem("user", JSON.stringify(data.data.user));
-        window.location.href = data.data.user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
+        navigate(data.data.user.role === "admin" ? "/admin/dashboard" : "/user/dashboard", { replace: true });
       } else {
         showAlert(data.message);
       }
     } catch {
-      showAlert("Gagal terhubung ke server.");
+      showAlert("Gagal terhubung ke server. Pastikan service berjalan.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRegister = async () => {
     const { name, email, password } = registerData;
     if (!name || !email || !password) return showAlert("Semua field wajib diisi.");
+    setLoading(true);
     try {
       const res = await fetch(`${AUTH_URL}/register`, {
         method: "POST",
@@ -51,21 +66,16 @@ function LandingPage() {
       if (data.success) {
         showAlert("Registrasi berhasil! Silakan login.", "success");
         setActiveTab("login");
+        setRegisterData({ name: "", email: "", password: "" });
       } else {
         showAlert(data.message);
       }
     } catch {
       showAlert("Gagal terhubung ke server.");
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (token && user) {
-      window.location.href = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
-    }
-  }, []);
 
   return (
     <div className="landing-bg">
@@ -82,15 +92,11 @@ function LandingPage() {
           <button
             className={`tab-pill ${activeTab === "login" ? "active" : ""}`}
             onClick={() => { setActiveTab("login"); setAlert({ message: "", type: "danger" }); }}
-          >
-            Masuk
-          </button>
+          >Masuk</button>
           <button
             className={`tab-pill ${activeTab === "register" ? "active" : ""}`}
             onClick={() => { setActiveTab("register"); setAlert({ message: "", type: "danger" }); }}
-          >
-            Daftar
-          </button>
+          >Daftar</button>
         </div>
 
         {alert.message && (
@@ -123,9 +129,9 @@ function LandingPage() {
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               />
             </div>
-            <button className="btn-submit" onClick={handleLogin}>
-              <i className="fas fa-sign-in-alt"></i>
-              Masuk ke Akun
+            <button className="btn-submit" onClick={handleLogin} disabled={loading}>
+              <i className={`fas ${loading ? "fa-spinner fa-spin" : "fa-sign-in-alt"}`}></i>
+              {loading ? "Memproses..." : "Masuk ke Akun"}
             </button>
           </div>
         )}
@@ -162,9 +168,9 @@ function LandingPage() {
                 onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
               />
             </div>
-            <button className="btn-submit" onClick={handleRegister}>
-              <i className="fas fa-user-plus"></i>
-              Buat Akun
+            <button className="btn-submit" onClick={handleRegister} disabled={loading}>
+              <i className={`fas ${loading ? "fa-spinner fa-spin" : "fa-user-plus"}`}></i>
+              {loading ? "Memproses..." : "Buat Akun"}
             </button>
           </div>
         )}
