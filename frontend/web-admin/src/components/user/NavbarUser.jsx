@@ -1,86 +1,46 @@
-function NavbarUser({
-  section,
-  changeSection,
-  user,
-  logout,
-}) {
+function NavbarUser({ section, changeSection, user, logout }) {
+  const navItems = [
+    { key: "disasters",   icon: "fas fa-fire",    label: "Bencana" },
+    { key: "assignments", icon: "fas fa-tasks",   label: "Penugasan Saya" },
+    { key: "profile",     icon: "fas fa-user",    label: "Profil" },
+  ];
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
-
-      <div className="container-fluid px-4">
-
-        <span className="navbar-brand fw-bold">
-          <i className="fas fa-hands-helping me-2 text-danger"></i>
-          DVN Relawan
-        </span>
-
-        <ul className="navbar-nav me-auto">
-
-          <li className="nav-item">
-            <button
-              className={`btn nav-link ${
-                section === "disasters"
-                  ? "active text-white"
-                  : "text-secondary"
-              }`}
-              onClick={() =>
-                changeSection("disasters")
-              }
-            >
-              <i className="fas fa-fire me-2"></i>
-              Bencana
-            </button>
-          </li>
-
-          <li className="nav-item">
-            <button
-              className={`btn nav-link ${
-                section === "assignments"
-                  ? "active text-white"
-                  : "text-secondary"
-              }`}
-              onClick={() =>
-                changeSection("assignments")
-              }
-            >
-              <i className="fas fa-tasks me-2"></i>
-              Penugasan Saya
-            </button>
-          </li>
-
-          <li className="nav-item">
-            <button
-              className={`btn nav-link ${
-                section === "profile"
-                  ? "active text-white"
-                  : "text-secondary"
-              }`}
-              onClick={() =>
-                changeSection("profile")
-              }
-            >
-              <i className="fas fa-user me-2"></i>
-              Profil
-            </button>
-          </li>
-
-        </ul>
-
-        <div className="d-flex align-items-center gap-3">
-
-          <span className="text-secondary small">
-            {user?.name}
-          </span>
-
-          <button
-            className="btn btn-outline-danger btn-sm"
-            onClick={logout}
-          >
-            Logout
-          </button>
-
+    <nav className="navbar-user">
+      <div className="navbar-brand-dvn">
+        <div className="brand-icon">
+          <i className="fas fa-hands-helping"></i>
         </div>
+        DVN Relawan
+      </div>
 
+      <div className="navbar-nav-links">
+        {navItems.map((item) => (
+          <button
+            key={item.key}
+            className={`navbar-nav-btn ${section === item.key ? "active" : ""}`}
+            onClick={() => changeSection(item.key)}
+          >
+            <i className={item.icon}></i>
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="navbar-right">
+        <div className="navbar-user-chip">
+          <div className="navbar-avatar">{getInitials(user?.name)}</div>
+          <span>{user?.name || "User"}</span>
+        </div>
+        <button className="btn btn-logout btn-sm" onClick={logout}>
+          <i className="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
       </div>
     </nav>
   );
