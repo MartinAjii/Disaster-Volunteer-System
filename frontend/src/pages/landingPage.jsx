@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
+import { AUTH_URL } from "../services/api";
 
 function LandingPage() {
-  const AUTH_URL = "http://localhost:3001";
-
   const [activeTab, setActiveTab] = useState("login");
 
   const [alert, setAlert] = useState({

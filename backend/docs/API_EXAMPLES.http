@@ -1,0 +1,110 @@
+### Health
+GET http://localhost:3000/
+
+### Register Volunteer
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+  "name": "Relawan Demo",
+  "email": "relawan@example.com",
+  "password": "relawan123",
+  "role": "volunteer",
+  "phone": "081234567890",
+  "address": "Yogyakarta",
+  "skills": "Medis, Logistik"
+}
+
+### Login
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "email": "admin@bnpb.go.id",
+  "password": "admin12345"
+}
+
+### Set token setelah login
+@token = isi_token_di_sini
+
+### Get Profile
+GET http://localhost:3000/profile
+Authorization: Bearer {{token}}
+
+### Get Disasters
+GET http://localhost:3000/disasters
+Authorization: Bearer {{token}}
+
+### Create Disaster
+POST http://localhost:3000/api/disasters
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Banjir Sleman",
+  "type": "Banjir",
+  "description": "Wilayah terdampak membutuhkan bantuan medis dan logistik.",
+  "location": "Sleman, Yogyakarta",
+  "latitude": -7.7320,
+  "longitude": 110.4020,
+  "severity": "high",
+  "disaster_date": "2026-05-23",
+  "status": "active"
+}
+
+### Get Volunteers
+GET http://localhost:3000/api/volunteers
+Authorization: Bearer {{token}}
+
+### Create Assignment
+POST http://localhost:3000/api/assignments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "volunteer_id": 1,
+  "disaster_id": 1,
+  "shelter_id": 1,
+  "assignment_status": "assigned",
+  "notes": "Bantu distribusi logistik di posko utama."
+}
+
+### Update Realtime Location Firestore
+POST http://localhost:3000/api/realtime/locations/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Relawan Demo",
+  "latitude": -7.8879,
+  "longitude": 110.3289,
+  "status": "available"
+}
+
+### Nearby Volunteers Firestore
+GET http://localhost:3000/api/realtime/locations/nearby?lat=-7.8881&lng=110.3288&radiusKm=10
+Authorization: Bearer {{token}}
+
+### Create Emergency Broadcast Firestore
+POST http://localhost:3000/api/realtime/broadcasts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Butuh Relawan Medis",
+  "location": "Bantul, Yogyakarta",
+  "need": "10 relawan medis dan 5 relawan logistik",
+  "priority": "high",
+  "disaster_id": 1
+}
+
+### Send Coordination Chat Firestore
+POST http://localhost:3000/api/realtime/chats/disaster-1/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "sender_id": 1,
+  "sender_name": "Admin BNPB",
+  "message": "Tim logistik segera menuju posko utama."
+}
