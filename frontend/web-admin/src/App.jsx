@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './pages/landingPage'
 import DashboardAdmin from './pages/admin/DashboardAdmin'
-import DashboardUser from './pages/user/DashboardUser'
 
 function PrivateRoute({ children, requiredRole }) {
   const token = localStorage.getItem('token')
@@ -20,9 +19,6 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/admin/dashboard" element={
           <PrivateRoute requiredRole="admin"><DashboardAdmin /></PrivateRoute>
-        } />
-        <Route path="/user/dashboard" element={
-          <PrivateRoute requiredRole="volunteer"><DashboardUser /></PrivateRoute>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
