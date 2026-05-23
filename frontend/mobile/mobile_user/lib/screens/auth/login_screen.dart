@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../dashboard/dashboard_screen.dart';
+import '../../core/services/auth_service.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
 
@@ -30,22 +31,76 @@ class _LoginScreenState
       isLoading = true;
     });
 
-    await Future.delayed(
-      const Duration(seconds: 1),
+    final result =
+        await AuthService.login(
+      email: emailController.text,
+      password:
+          passwordController.text,
     );
 
     setState(() {
       isLoading = false;
     });
 
-    Navigator.pushReplacement(
-      context,
+    if (result["success"] == true) {
 
-      MaterialPageRoute(
-        builder: (_) =>
-            const DashboardScreen(),
-      ),
-    );
+      final data = result["data"];
+
+      final token = data["token"];
+
+      final user = data["user"];
+
+      if (user["role"] != "volunteer") {
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+
+          const SnackBar(
+            content: Text(
+              "Aplikasi mobile hanya untuk relawan",
+            ),
+          ),
+        );
+
+        return;
+      }
+
+      await AuthService.saveAuthData(
+        token,
+        user,
+      );
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+          content: Text(
+            "Login berhasil",
+          ),
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+
+        MaterialPageRoute(
+          builder: (_) =>
+              const DashboardScreen(),
+        ),
+      );
+    } else {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        SnackBar(
+          content: Text(
+            result["message"] ??
+                "Login gagal",
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -184,6 +239,28 @@ class _LoginScreenState
                             ),
                 ),
               ),
+
+              const SizedBox(height: 20),
+
+              TextButton(
+
+                onPressed: () {
+
+                  Navigator.push(
+                    context,
+
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          const RegisterScreen(),
+                    ),
+                  );
+                },
+
+                child: const Text(
+                  "Belum punya akun? Register",
+                ),
+              ),
+
             ],
           ),
         ),

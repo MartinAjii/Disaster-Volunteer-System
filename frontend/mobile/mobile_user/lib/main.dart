@@ -1,37 +1,61 @@
 import 'package:flutter/material.dart';
-
 import 'screens/auth/login_screen.dart';
+import 'core/services/auth_service.dart';
+import 'screens/dashboard/dashboard_screen.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() =>
+      _MyAppState();
+}
+
+class _MyAppState
+    extends State<MyApp> {
+
+  Widget screen =
+      const LoginScreen();
+
+  @override
+  void initState() {
+    super.initState();
+
+    checkLogin();
+  }
+
+  void checkLogin() async {
+
+    final token =
+        await AuthService.getToken();
+
+    if (token != null) {
+
+      setState(() {
+
+        screen =
+            const DashboardScreen();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner:
+          false,
 
       title: 'Disaster Volunteer',
 
-      theme: ThemeData(
-        brightness: Brightness.dark,
+      theme: ThemeData.dark(),
 
-        scaffoldBackgroundColor:
-            const Color(0xFF0F1923),
-
-        primaryColor:
-            const Color(0xFFE63946),
-
-        colorScheme: ColorScheme.dark(
-          primary: const Color(0xFFE63946),
-        ),
-      ),
-
-      home: const LoginScreen(),
+      home: screen,
     );
   }
 }
