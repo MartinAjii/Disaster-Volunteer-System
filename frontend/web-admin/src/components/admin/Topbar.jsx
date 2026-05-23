@@ -1,9 +1,5 @@
 const Topbar = ({ title = "Dashboard Admin", subtitle = "Disaster Volunteer Network System" }) => {
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/";
-  };
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   return (
     <div className="topbar">
@@ -17,10 +13,13 @@ const Topbar = ({ title = "Dashboard Admin", subtitle = "Disaster Volunteer Netw
           <i className="fas fa-bell"></i>
           Notifikasi
         </button>
-        <button className="btn btn-logout btn-sm" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt"></i>
-          Logout
-        </button>
+        {/* Logout dihapus dari sini — ada di Sidebar */}
+        <div className="navbar-user-chip">
+          <div className="navbar-avatar">
+            <i className="fas fa-user-shield"></i>
+          </div>
+          {user?.name || "Admin"}
+        </div>
       </div>
     </div>
   );
