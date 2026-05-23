@@ -1,0 +1,24 @@
+.stat-card {
+  background: #141e2b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border-left: 4px solid #e63946;
+}
+
+.stat-card.blue {
+  border-left-color: #457b9d;
+}
+
+.stat-card.green {
+  border-left-color: #2a9d8f;
+}
+
+.stat-card.orange {
+  border-left-color: #f4a261;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+}
