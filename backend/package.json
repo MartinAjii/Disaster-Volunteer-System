@@ -5,9 +5,9 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
     "db:migrate": "node src/scripts/migrate.js",
-    "seed:admin": "node src/scripts/seedAdmin.js"
+    "seed:admin": "node src/scripts/seedAdmin.js",
+    "dev": "node --watch src/app.js"
   },
   "keywords": [
     "nodejs",

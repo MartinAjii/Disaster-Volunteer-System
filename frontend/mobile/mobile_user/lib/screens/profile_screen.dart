@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../../core/services/auth_service.dart';
-
-import '../auth/login_screen.dart';
+import './login_screen.dart';
 
 class ProfileScreen
     extends StatelessWidget {
