@@ -60,17 +60,46 @@ const createReport =
 
     if (req.file) {
 
-      const uploaded =
-        await uploadBuffer(
-          req.file,
-          'reports'
-        );
+      const base64 =
+        req.file.buffer.toString('base64');
 
-      if (uploaded) {
+      const mimeType =
+        req.file.mimetype ||
+        'image/jpeg';
 
-        finalPhotoUrl =
-          uploaded;
-      }
+      finalPhotoUrl =
+        `data:${mimeType};base64,${base64}`;
+
+      console.log(
+        '=== PHOTO DEBUG ==='
+      );
+
+      console.log(
+        'Original file size:',
+        req.file.size,
+        'bytes'
+      );
+
+      console.log(
+        'Base64 size:',
+        finalPhotoUrl.length,
+        'bytes'
+      );
+
+      console.log(
+        'MIME type:',
+        mimeType
+      );
+
+      console.log(
+        'Base64 preview:',
+        finalPhotoUrl.substring(0, 50),
+        '...'
+      );
+
+      console.log(
+        '==================='
+      );
     }
 
     const result =
@@ -289,17 +318,21 @@ const updateReport =
 
     if (req.file) {
 
-      const uploaded =
-        await uploadBuffer(
-          req.file,
-          'reports'
-        );
+      const base64 =
+        req.file.buffer.toString('base64');
 
-      if (uploaded) {
+      const mimeType =
+        req.file.mimetype ||
+        'image/jpeg';
 
-        finalPhotoUrl =
-          uploaded;
-      }
+      finalPhotoUrl =
+        `data:${mimeType};base64,${base64}`;
+
+      console.log(
+        'Photo stored as base64, size:',
+        finalPhotoUrl.length,
+        'bytes'
+      );
     }
 
     const oldReport =

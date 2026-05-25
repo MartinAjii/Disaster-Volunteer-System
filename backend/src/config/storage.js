@@ -27,24 +27,29 @@ async function uploadBuffer(file, folder = 'reports') {
     return null;
   }
 
-  const ext = path.extname(file.originalname || '');
-  const filename = `${folder}/${Date.now()}-${crypto.randomUUID()}${ext}`;
-  const gcsFile = selectedBucket.file(filename);
-
-  await gcsFile.save(file.buffer, {
-    metadata: {
-      contentType: file.mimetype
-    },
-    resumable: false
-  });
-
   try {
-    await gcsFile.makePublic();
-  } catch (error) {
-    console.warn('Upload berhasil, tetapi file tidak dibuat public:', error.message);
-  }
+    const ext = path.extname(file.originalname || '');
+    const filename = `${folder}/${Date.now()}-${crypto.randomUUID()}${ext}`;
+    const gcsFile = selectedBucket.file(filename);
 
-  return `https://storage.googleapis.com/${selectedBucket.name}/${filename}`;
+    await gcsFile.save(file.buffer, {
+      metadata: {
+        contentType: file.mimetype
+      },
+      resumable: false
+    });
+
+    try {
+      await gcsFile.makePublic();
+    } catch (error) {
+      console.warn('Upload berhasil, tetapi file tidak dibuat public:', error.message);
+    }
+
+    return `https://storage.googleapis.com/${selectedBucket.name}/${filename}`;
+  } catch (error) {
+    console.warn('GCS upload failed - continuing without photo:', error.message);
+    return null;
+  }
 }
 
 module.exports = { uploadBuffer };

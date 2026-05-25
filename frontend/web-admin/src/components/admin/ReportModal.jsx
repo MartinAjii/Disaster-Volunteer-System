@@ -387,6 +387,9 @@ const ReportModal = ({
                   src={
                     report.photo_url.startsWith(
                       "http"
+                    ) ||
+                    report.photo_url.startsWith(
+                      "data:"
                     )
 
                       ? report.photo_url
