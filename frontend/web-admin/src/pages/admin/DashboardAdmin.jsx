@@ -686,6 +686,8 @@ const DashboardAdmin = () => {
         fields: [
           { key: "title",    label: "Judul Bencana", placeholder: "cth: Banjir Bandang Desa X" },
           { key: "location", label: "Lokasi" },
+            { key: "latitude", label: "Latitude", type: "number", required: false },
+          { key: "longitude", label: "Longitude", type: "number", required: false },
           { key: "type",     label: "Jenis Bencana", type: "select",
             options: ["Banjir", "Gempa", "Longsor", "Kebakaran", "Tsunami", "Angin Puting Beliung", "Lainnya"] },
           { key: "severity", label: "Tingkat Keparahan", type: "select", default: "medium",
