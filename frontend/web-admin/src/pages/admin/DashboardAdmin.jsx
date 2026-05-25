@@ -43,14 +43,14 @@ const DashboardAdmin = () => {
   const [mapView, setMapView] = useState(null);
 
   const getUser = () => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = sessionStorage.getItem("user");
 
     try {
       if (storedUser && storedUser !== "undefined") {
         return JSON.parse(storedUser);
       }
     } catch {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
     }
 
     return {};
@@ -91,22 +91,18 @@ const DashboardAdmin = () => {
       title: "Dashboard",
       sub: "Ringkasan data sistem",
     },
-
     volunteers: {
       title: "Volunteer Management",
       sub: "Kelola data relawan",
     },
-
     disasters: {
       title: "Disaster Reports",
       sub: "Data laporan bencana",
     },
-
     shelters: {
       title: "Shelter Management",
       sub: "Data shelter / posko",
     },
-
     assignments: {
       title: "Assignments",
       sub: "Penugasan relawan",
@@ -114,8 +110,8 @@ const DashboardAdmin = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     navigate("/", {
       replace: true,
@@ -152,18 +148,10 @@ const DashboardAdmin = () => {
       setDisasters(await parse(dRes));
       setShelters(await parse(sRes));
       setAssignments(await parse(aRes));
-
     } catch (err) {
-
-      setError(
-        err.message ||
-        "Gagal mengambil data dari server"
-      );
-
+      setError(err.message || "Gagal mengambil data dari server");
     } finally {
-
       setLoading(false);
-
     }
   };
 
@@ -172,12 +160,9 @@ const DashboardAdmin = () => {
   }, []);
 
   useEffect(() => {
-
     const unsubscribe = onSnapshot(
       collection(db, "realtime_locations"),
-
       (snapshot) => {
-
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -185,21 +170,15 @@ const DashboardAdmin = () => {
 
         setRealtimeLocations(data);
       },
-
       (error) => {
-        console.error(
-          "Firebase realtime error:",
-          error
-        );
+        console.error("Firebase realtime error:", error);
       }
     );
 
     return () => unsubscribe();
-
   }, []);
 
   const postData = async (url, body) => {
-
     const res = await fetch(url, {
       method: "POST",
       headers: authHeaders(),
@@ -209,16 +188,13 @@ const DashboardAdmin = () => {
     const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      throw new Error(
-        json.message || "Gagal menyimpan data"
-      );
+      throw new Error(json.message || "Gagal menyimpan data");
     }
 
     return json;
   };
 
   const deleteData = async (url) => {
-
     const res = await fetch(url, {
       method: "DELETE",
       headers: authHeaders(),
@@ -227,9 +203,7 @@ const DashboardAdmin = () => {
     const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      throw new Error(
-        json.message || "Gagal menghapus data"
-      );
+      throw new Error(json.message || "Gagal menghapus data");
     }
 
     return json;
@@ -239,25 +213,15 @@ const DashboardAdmin = () => {
   // DELETE VOLUNTEER
   // ─────────────────────────────
   const handleDeleteVolunteer = async (id) => {
-
-    const confirmDelete = window.confirm(
-      "Yakin ingin menghapus volunteer ini?"
-    );
+    const confirmDelete = window.confirm("Yakin ingin menghapus volunteer ini?");
 
     if (!confirmDelete) return;
 
     try {
-
-      await deleteData(
-        `${VOLUNTEERS_URL}/${id}`
-      );
-
+      await deleteData(`${VOLUNTEERS_URL}/${id}`);
       fetchData();
-
     } catch (err) {
-
       alert(err.message);
-
     }
   };
 
@@ -265,41 +229,31 @@ const DashboardAdmin = () => {
   // EDIT DISASTER
   // ─────────────────────────────
   const openEditDisaster = (disaster) => {
-
     setModal({
-
       type: "disasters",
-
       title: "Edit Disaster",
-
       initialData: disaster,
-
       fields: [
-
         {
           key: "title",
           label: "Judul Bencana",
         },
-
         {
           key: "location",
           label: "Lokasi",
         },
-
         {
           key: "latitude",
           label: "Latitude",
           type: "number",
           required: false,
         },
-
         {
           key: "longitude",
           label: "Longitude",
           type: "number",
           required: false,
         },
-
         {
           key: "type",
           label: "Jenis Bencana",
@@ -314,156 +268,198 @@ const DashboardAdmin = () => {
             "Lainnya",
           ],
         },
-
         {
           key: "severity",
           label: "Tingkat Keparahan",
           type: "select",
-          options: [
-            "low",
-            "medium",
-            "high",
-            "critical",
-          ],
+          options: ["low", "medium", "high", "critical"],
         },
-
         {
           key: "disaster_date",
           label: "Tanggal Kejadian",
           type: "date",
         },
-
         {
           key: "description",
           label: "Deskripsi",
           type: "textarea",
           required: false,
         },
-
         {
           key: "status",
           label: "Status",
           type: "select",
-          options: [
-            "active",
-            "handled",
-            "closed",
-          ],
+          options: ["active", "handled", "closed"],
         },
       ],
-
       onSubmit: async (form) => {
-
-        const res = await fetch(
-          `${DISASTERS_URL}/${disaster.id}`,
-          {
-            method: "PUT",
-            headers: authHeaders(),
-            body: JSON.stringify(form),
-          }
-        );
+        const res = await fetch(`${DISASTERS_URL}/${disaster.id}`, {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify(form),
+        });
 
         const json = await res.json();
 
         if (!res.ok) {
-          throw new Error(
-            json.message ||
-            "Gagal update disaster"
-          );
+          throw new Error(json.message || "Gagal update disaster");
         }
 
         setModal(null);
-
         fetchData();
       },
     });
   };
 
+  // ─────────────────────────────
+  // EDIT SHELTER
+  // ─────────────────────────────
+  const openEditShelter = (shelter) => {
+    setModal({
+      type: "shelters",
+      title: "Edit Shelter / Posko",
+      initialData: shelter,
+      fields: [
+        {
+          key: "name",
+          label: "Nama Shelter",
+        },
+        {
+          key: "location",
+          label: "Lokasi / Alamat",
+        },
+        {
+          key: "latitude",
+          label: "Latitude",
+          type: "number",
+          required: false,
+        },
+        {
+          key: "longitude",
+          label: "Longitude",
+          type: "number",
+          required: false,
+        },
+        {
+          key: "capacity",
+          label: "Kapasitas",
+          type: "number",
+        },
+        {
+          key: "status",
+          label: "Status",
+          type: "select",
+          options: ["tersedia", "penuh"],
+        },
+        {
+          key: "coordinator",
+          label: "Nama Koordinator",
+          required: false,
+        },
+        {
+          key: "contact",
+          label: "Kontak",
+          required: false,
+        },
+      ],
+      onSubmit: async (form) => {
+        const res = await fetch(`${SHELTERS_URL}/${shelter.id}`, {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify(form),
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) {
+          throw new Error(json.message || "Gagal update shelter");
+        }
+
+        setModal(null);
+        fetchData();
+      },
+    });
+  };
+
+  // ─────────────────────────────
+  // DELETE SHELTER
+  // ─────────────────────────────
+  const handleDeleteShelter = async (id) => {
+    const confirmDelete = window.confirm("Yakin ingin menghapus shelter ini?");
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteData(`${SHELTERS_URL}/${id}`);
+      fetchData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // ─────────────────────────────
+  // OPEN MODAL (ADD)
+  // ─────────────────────────────
   const openModal = (section) => {
-
     const configs = {
-
       volunteers: {
         title: "Tambah Volunteer",
-
         fields: [
           {
             key: "full_name",
             label: "Nama Lengkap",
           },
-
           {
             key: "phone",
             label: "Nomor Telepon",
             required: false,
             placeholder: "08xxxxxxxxxx",
           },
-
           {
             key: "address",
             label: "Alamat",
             type: "textarea",
             required: false,
           },
-
           {
             key: "skills",
             label: "Keahlian",
             required: false,
-            placeholder:
-              "cth: P3K, Evakuasi",
+            placeholder: "cth: P3K, Evakuasi",
           },
-
           {
             key: "availability_status",
             label: "Status Ketersediaan",
             type: "select",
             default: "available",
-
-            options: [
-              "available",
-              "assigned",
-              "unavailable",
-            ],
+            options: ["available", "assigned", "unavailable"],
           },
         ],
-
         onSubmit: async (form) => {
-
-          await postData(
-            VOLUNTEERS_URL,
-            form
-          );
-
+          await postData(VOLUNTEERS_URL, form);
           setModal(null);
-
           fetchData();
         },
       },
 
       disasters: {
         type: "disasters",
-
         title: "Tambah Laporan Bencana",
-
         fields: [
           {
             key: "title",
             label: "Judul Bencana",
           },
-
           {
             key: "location",
             label: "Lokasi",
           },
-
           {
             key: "latitude",
             label: "Latitude",
             type: "number",
             required: false,
           },
-
           {
             key: "longitude",
             label: "Longitude",
@@ -471,80 +467,69 @@ const DashboardAdmin = () => {
             required: false,
           },
         ],
-
         onSubmit: async (form) => {
-
-          await postData(
-            DISASTERS_URL,
-            form
-          );
-
+          await postData(DISASTERS_URL, form);
           setModal(null);
-
           fetchData();
         },
       },
 
       shelters: {
         type: "shelters",
-
         title: "Tambah Shelter / Posko",
-
         fields: [
           {
             key: "name",
             label: "Nama Shelter",
           },
-
           {
             key: "location",
             label: "Lokasi / Alamat",
           },
-
+          {
+            key: "latitude",
+            label: "Latitude",
+            type: "number",
+            required: false,
+          },
+          {
+            key: "longitude",
+            label: "Longitude",
+            type: "number",
+            required: false,
+          },
           {
             key: "capacity",
             label: "Kapasitas",
             type: "number",
             default: "0",
           },
-
           {
-            key: "current_capacity",
-            label: "Pengungsi Saat Ini",
-            type: "number",
-            default: "0",
-            required: false,
+            key: "status",
+            label: "Status",
+            type: "select",
+            options: ["tersedia", "penuh"],
           },
-
           {
             key: "coordinator",
             label: "Nama Koordinator",
             required: false,
           },
-
           {
             key: "contact",
             label: "Kontak",
             required: false,
           },
         ],
-
         onSubmit: async (form) => {
-
-          await postData(
-            SHELTERS_URL,
-            form
-          );
-
+          await postData(SHELTERS_URL, form);
           setModal(null);
-
           fetchData();
         },
       },
 
       assignments: {
         title: "Tambah Assignment",
-
         fields: [
           {
             key: "volunteer_id",
@@ -557,7 +542,6 @@ const DashboardAdmin = () => {
                 label: `${v.full_name}${v.skills ? ` — ${v.skills}` : ""}`,
               })),
           },
-
           {
             key: "disaster_id",
             label: "Bencana",
@@ -569,7 +553,6 @@ const DashboardAdmin = () => {
                 label: `${d.title} (${d.location || d.type || "-"})`,
               })),
           },
-
           {
             key: "shelter_id",
             label: "Shelter",
@@ -581,20 +564,13 @@ const DashboardAdmin = () => {
             })),
           },
         ],
-
         onSubmit: async (form) => {
-
           if (!form.shelter_id) {
             delete form.shelter_id;
           }
 
-          await postData(
-            ASSIGNMENTS_URL,
-            form
-          );
-
+          await postData(ASSIGNMENTS_URL, form);
           setModal(null);
-
           fetchData();
         },
       },
@@ -640,14 +616,9 @@ const DashboardAdmin = () => {
       />
 
       <div className="main-content">
-
         <Topbar
-          title={
-            sectionTitles[activeSection]?.title
-          }
-          sub={
-            sectionTitles[activeSection]?.sub
-          }
+          title={sectionTitles[activeSection]?.title}
+          sub={sectionTitles[activeSection]?.sub}
           user={user}
         />
 
@@ -666,9 +637,7 @@ const DashboardAdmin = () => {
             volunteers={volunteers}
             loading={loading}
             error={error}
-            onAdd={() =>
-              openModal("volunteers")
-            }
+            onAdd={() => openModal("volunteers")}
             onMap={(v) =>
               setMapView({
                 data: v,
@@ -684,9 +653,7 @@ const DashboardAdmin = () => {
             disasters={disasters}
             loading={loading}
             error={error}
-            onAdd={() =>
-              openModal("disasters")
-            }
+            onAdd={() => openModal("disasters")}
             onMap={(d) =>
               setMapView({
                 data: d,
@@ -694,11 +661,7 @@ const DashboardAdmin = () => {
               })
             }
             onEdit={openEditDisaster}
-            onDelete={(id) =>
-              deleteData(
-                `${DISASTERS_URL}/${id}`
-              )
-            }
+            onDelete={(id) => deleteData(`${DISASTERS_URL}/${id}`)}
           />
         )}
 
@@ -707,15 +670,15 @@ const DashboardAdmin = () => {
             shelters={shelters}
             loading={loading}
             error={error}
-            onAdd={() =>
-              openModal("shelters")
-            }
+            onAdd={() => openModal("shelters")}
             onMap={(s) =>
               setMapView({
                 data: s,
                 type: "shelter",
               })
             }
+            onEdit={openEditShelter}
+            onDelete={handleDeleteShelter}
           />
         )}
 
@@ -725,22 +688,15 @@ const DashboardAdmin = () => {
             loading={loading}
             error={error}
             onAdd={() => openModal("assignments")}
-
             onViewReport={(assignment) => {
-
               setModal({
-
                 type: "report",
-
                 title: "Laporan Volunteer",
-
-                assignment
-
+                assignment,
               });
             }}
           />
         )}
-
       </div>
     </>
   );

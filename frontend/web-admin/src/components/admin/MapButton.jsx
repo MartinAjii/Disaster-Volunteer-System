@@ -1,9 +1,10 @@
 const MapButton = ({ onClick, color = "#3b82f6", label = "Peta" }) => (
   <button
+    type="button"
     onClick={onClick}
     title={`Lihat ${label} di Peta`}
+    className="btn btn-sm"
     style={{
-      padding: "4px 10px",
       borderRadius: 6,
       border: "none",
       background: color,

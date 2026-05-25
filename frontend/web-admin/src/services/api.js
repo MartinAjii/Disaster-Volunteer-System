@@ -10,7 +10,7 @@ export const ASSIGNMENTS_URL = `${API_URL}/assignments`;
 
 export const authHeaders = () => {
   return {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     "Content-Type": "application/json",
   };
 };
