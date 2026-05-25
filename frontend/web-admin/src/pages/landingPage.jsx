@@ -87,27 +87,33 @@ function LandingPage() {
         )}
 
         <div>
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              placeholder="email@example.com"
-              value={loginData.email}
-              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              placeholder="••••••••"
-              value={loginData.password}
-              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            />
-          </div>
+            <div className="login-field">
+              <label className="login-label" htmlFor="email">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className="login-input"
+                placeholder="email@example.com"
+                autoComplete="email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+              />
+         </div>
+            <div className="login-field">
+              <label className="login-label" htmlFor="password">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="login-input"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                value={loginData.password}
+                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+              />
+            </div>
           <button className="btn-submit" onClick={handleLogin} disabled={loading}>
             <i className={`fas ${loading ? "fa-spinner fa-spin" : "fa-sign-in-alt"}`}></i>
             {loading ? "Memproses..." : "Masuk ke Akun"}
