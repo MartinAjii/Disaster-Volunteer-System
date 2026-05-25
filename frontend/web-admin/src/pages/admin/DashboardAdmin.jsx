@@ -148,6 +148,90 @@ const DashboardAdmin = () => {
     return json;
   };
 
+  const updateData = async (url, id, body) => {
+  const res = await fetch(`${url}/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(body),
+  });
+
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(json.message || "Gagal mengubah data");
+  }
+
+  return json;
+};
+
+const deleteData = async (url, id) => {
+  const yakin = confirm("Yakin ingin menghapus data ini?");
+  if (!yakin) return;
+
+  const res = await fetch(`${url}/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    alert(json.message || "Gagal menghapus data");
+    return;
+  }
+
+  fetchData();
+};
+  const openEditDisaster = (item) => {
+  setModal({
+    type: "disasters",
+    title: "Edit Laporan Bencana",
+    initialData: item,
+    fields: [
+      { key: "title", label: "Judul Bencana" },
+      { key: "location", label: "Lokasi" },
+      { key: "latitude", label: "Latitude", type: "number", required: false },
+      { key: "longitude", label: "Longitude", type: "number", required: false },
+      {
+        key: "type",
+        label: "Jenis Bencana",
+        type: "select",
+        options: [
+          "Banjir",
+          "Gempa",
+          "Longsor",
+          "Kebakaran",
+          "Tsunami",
+          "Angin Puting Beliung",
+          "Lainnya",
+        ],
+      },
+      {
+        key: "severity",
+        label: "Tingkat Keparahan",
+        type: "select",
+        default: "medium",
+        options: ["low", "medium", "high", "critical"],
+      },
+      { key: "disaster_date", label: "Tanggal Kejadian", type: "date" },
+      { key: "description", label: "Deskripsi", type: "textarea", required: false },
+      {
+        key: "status",
+        label: "Status",
+        type: "select",
+        default: "active",
+        options: ["active", "handled", "closed"],
+      },
+    ],
+    onSubmit: async (form) => {
+      await updateData(DISASTERS_URL, item.id, form);
+      setModal(null);
+      fetchData();
+    },
+  });
+};
+
+
   const openModal = (section) => {
     const configs = {
       volunteers: {
@@ -264,6 +348,7 @@ const DashboardAdmin = () => {
           title={modal.title}
           fields={modal.fields}
           type={modal.type}
+          initialData={modal.initialData}
           onClose={() => setModal(null)}
           onSubmit={modal.onSubmit}
         />
@@ -319,6 +404,8 @@ const DashboardAdmin = () => {
             error={error}
             onAdd={() => openModal("disasters")}
             onMap={(d) => setMapView({ data: d, type: "disaster" })}
+            onEdit={openEditDisaster}
+            onDelete={(id) => deleteData(DISASTERS_URL, id)}
           />
         )}
 
