@@ -115,6 +115,14 @@ CREATE TABLE IF NOT EXISTS volunteer_status_logs (
     ON DELETE CASCADE
 );
 
+CREATE TABLE locations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    latitude DOUBLE,
+    longitude DOUBLE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO disasters
   (title, type, description, location, latitude, longitude, severity, disaster_date, status)
 SELECT

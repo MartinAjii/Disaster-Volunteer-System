@@ -3,13 +3,17 @@ import './dashboard_screen.dart';
 import '../../core/services/auth_service.dart';
 import 'register_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen
+    extends StatefulWidget {
 
-  const LoginScreen({super.key});
+  const LoginScreen({
+    super.key,
+  });
 
   @override
-  State<LoginScreen> createState() =>
-      _LoginScreenState();
+  State<LoginScreen>
+      createState() =>
+          _LoginScreenState();
 }
 
 class _LoginScreenState
@@ -33,7 +37,10 @@ class _LoginScreenState
 
     final result =
         await AuthService.login(
-      email: emailController.text,
+
+      email:
+          emailController.text,
+
       password:
           passwordController.text,
     );
@@ -42,20 +49,25 @@ class _LoginScreenState
       isLoading = false;
     });
 
+    print(result);
+
     if (result["success"] == true) {
 
-      final data = result["data"];
+      final token =
+          result["token"];
 
-      final token = data["token"];
+      final user =
+          result["data"];
 
-      final user = data["user"];
+      if (user["role"] !=
+          "volunteer") {
 
-      if (user["role"] != "volunteer") {
-
-        ScaffoldMessenger.of(context)
+        ScaffoldMessenger.of(
+                context)
             .showSnackBar(
 
           const SnackBar(
+
             content: Text(
               "Aplikasi mobile hanya untuk relawan",
             ),
@@ -65,12 +77,16 @@ class _LoginScreenState
         return;
       }
 
-      await AuthService.saveAuthData(
+      await AuthService
+          .saveAuthData(
+
         token,
+
         user,
       );
 
-      ScaffoldMessenger.of(context)
+      ScaffoldMessenger.of(
+              context)
           .showSnackBar(
 
         const SnackBar(
@@ -81,6 +97,7 @@ class _LoginScreenState
       );
 
       Navigator.pushReplacement(
+
         context,
 
         MaterialPageRoute(
@@ -88,13 +105,17 @@ class _LoginScreenState
               const DashboardScreen(),
         ),
       );
+
     } else {
 
-      ScaffoldMessenger.of(context)
+      ScaffoldMessenger.of(
+              context)
           .showSnackBar(
 
         SnackBar(
+
           content: Text(
+
             result["message"] ??
                 "Login gagal",
           ),
@@ -120,25 +141,37 @@ class _LoginScreenState
             children: [
 
               const Icon(
-                Icons.volunteer_activism,
+
+                Icons
+                    .volunteer_activism,
+
                 size: 90,
-                color: Color(0xFFE63946),
+
+                color:
+                    Color(0xFFE63946),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(
+                  height: 20),
 
               const Text(
+
                 "Disaster Volunteer",
 
                 style: TextStyle(
+
                   fontSize: 28,
-                  fontWeight: FontWeight.bold,
+
+                  fontWeight:
+                      FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(
+                  height: 8),
 
               const Text(
+
                 "Sistem Relawan Bencana",
 
                 style: TextStyle(
@@ -146,14 +179,19 @@ class _LoginScreenState
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(
+                  height: 40),
 
               TextField(
-                controller: emailController,
+
+                controller:
+                    emailController,
 
                 decoration:
                     InputDecoration(
-                  labelText: "Email",
+
+                  labelText:
+                      "Email",
 
                   filled: true,
 
@@ -162,6 +200,7 @@ class _LoginScreenState
 
                   border:
                       OutlineInputBorder(
+
                     borderRadius:
                         BorderRadius.circular(
                             12),
@@ -169,9 +208,11 @@ class _LoginScreenState
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(
+                  height: 20),
 
               TextField(
+
                 controller:
                     passwordController,
 
@@ -179,7 +220,9 @@ class _LoginScreenState
 
                 decoration:
                     InputDecoration(
-                  labelText: "Password",
+
+                  labelText:
+                      "Password",
 
                   filled: true,
 
@@ -188,6 +231,7 @@ class _LoginScreenState
 
                   border:
                       OutlineInputBorder(
+
                     borderRadius:
                         BorderRadius.circular(
                             12),
@@ -195,22 +239,30 @@ class _LoginScreenState
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(
+                  height: 30),
 
               SizedBox(
-                width: double.infinity,
+
+                width:
+                    double.infinity,
+
                 height: 55,
 
-                child: ElevatedButton(
+                child:
+                    ElevatedButton(
 
                   style:
-                      ElevatedButton.styleFrom(
+                      ElevatedButton
+                          .styleFrom(
+
                     backgroundColor:
                         const Color(
                             0xFFE63946),
 
                     shape:
                         RoundedRectangleBorder(
+
                       borderRadius:
                           BorderRadius.circular(
                               12),
@@ -224,29 +276,40 @@ class _LoginScreenState
 
                   child:
                       isLoading
+
                           ? const CircularProgressIndicator(
                               color:
                                   Colors.white,
                             )
+
                           : const Text(
+
                               "LOGIN",
 
-                              style: TextStyle(
+                              style:
+                                  TextStyle(
+
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                color:
+                                    Colors.white,
                               ),
                             ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(
+                  height: 20),
 
               TextButton(
 
                 onPressed: () {
 
                   Navigator.push(
+
                     context,
 
                     MaterialPageRoute(
@@ -260,7 +323,6 @@ class _LoginScreenState
                   "Belum punya akun? Register",
                 ),
               ),
-
             ],
           ),
         ),

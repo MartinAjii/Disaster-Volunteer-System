@@ -8,7 +8,9 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'disaster_volunteer_db',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
 });
 
 async function testConnection() {

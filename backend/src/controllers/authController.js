@@ -12,32 +12,105 @@ function signToken(user) {
 }
 
 const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+
+  const { email, password } =
+    req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ success: false, message: 'Email dan password wajib diisi' });
+
+    return res.status(400).json({
+
+      success: false,
+
+      message:
+        'Email dan password wajib diisi'
+    });
   }
 
-  const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+  const [rows] =
+    await pool.execute(
+
+      'SELECT * FROM users WHERE email = ?',
+
+      [email]
+    );
 
   if (rows.length === 0) {
-    return res.status(401).json({ success: false, message: 'Email atau password salah' });
+
+    return res.status(401).json({
+
+      success: false,
+
+      message:
+        'Email atau password salah'
+    });
   }
 
   const user = rows[0];
-  const valid = await bcrypt.compare(password, user.password);
+
+  const valid =
+    await bcrypt.compare(
+
+      password,
+
+      user.password
+    );
 
   if (!valid) {
-    return res.status(401).json({ success: false, message: 'Email atau password salah' });
+
+    return res.status(401).json({
+
+      success: false,
+
+      message:
+        'Email atau password salah'
+    });
   }
 
-  const safeUser = { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone };
-  const [volunteers] = await pool.execute('SELECT * FROM volunteers WHERE user_id = ?', [user.id]);
+  const [volunteerRows] =
+    await pool.execute(
+
+      `SELECT *
+       FROM volunteers
+       WHERE user_id = ?`,
+
+      [user.id]
+    );
+
+  const volunteer =
+    volunteerRows[0] || null;
+
+  const safeUser = {
+
+    id: user.id,
+
+    name: user.name,
+
+    email: user.email,
+
+    role: user.role,
+
+    phone: user.phone
+  };
+
+  const token =
+    signToken(safeUser);
 
   res.json({
+
     success: true,
-    message: 'Login berhasil',
-    data: { user: safeUser, volunteer: volunteers[0] || null, token: signToken(safeUser) }
+
+    message:
+      'Login berhasil',
+
+    token,
+
+    data: {
+
+      ...safeUser,
+
+      volunteer
+    }
   });
 });
 
