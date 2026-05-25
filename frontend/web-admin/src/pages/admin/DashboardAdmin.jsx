@@ -9,9 +9,88 @@ import {
   ASSIGNMENTS_URL,
 } from "../../services/api";
 import "../../index.css";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
+const LocationPicker = ({ form, setForm }) => {
+  const ClickHandler = () => {
+    useMapEvents({
+      click: async (e) => {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
 
-const Modal = ({ title, fields, onClose, onSubmit }) => {
+      let locationName = `${lat}, ${lng}`;
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        );
+
+        const data = await res.json();
+
+        if (data?.display_name) {
+          locationName = data.display_name;
+        }
+      } catch (err) {
+        console.error("Gagal mengambil nama lokasi:", err);
+      }
+
+      setForm({
+        ...form,
+        latitude: lat,
+        longitude: lng,
+        location: locationName,
+      });
+      }
+    });
+
+    return null;
+  };
+
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label
+        style={{
+          display: "block",
+          fontSize: 13,
+          fontWeight: 600,
+          marginBottom: 5,
+          color: "#475569",
+        }}
+      >
+        Pilih Lokasi di Peta
+      </label>
+
+      <MapContainer
+        center={[-7.7956, 110.3695]}
+        zoom={11}
+        style={{
+          height: "260px",
+          width: "100%",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+      >
+        <TileLayer
+          attribution="&copy; OpenStreetMap"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        <ClickHandler />
+
+        {form.latitude && form.longitude && (
+          <Marker position={[form.latitude, form.longitude]} />
+        )}
+      </MapContainer>
+
+      <small style={{ color: "#64748b" }}>
+        Klik titik lokasi bencana pada peta.
+      </small>
+    </div>
+  );
+};
+
+const Modal = ({ title, fields, onClose, onSubmit, type }) => {
   const [form, setForm] = useState(
     fields.reduce((acc, f) => ({ ...acc, [f.key]: f.default ?? "" }), {})
   );
@@ -56,6 +135,9 @@ const Modal = ({ title, fields, onClose, onSubmit }) => {
         )}
 
         <form onSubmit={handleSubmit}>
+          {type === "disasters" && (
+            <LocationPicker form={form} setForm={setForm} />
+          )}
           {fields.map((f) => (
             <div key={f.key} style={{ marginBottom: 14 }}>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 5, color: "#475569" }}>
@@ -217,6 +299,7 @@ const DashboardAdmin = () => {
 
       /* Disaster: wajib title, type, location, disaster_date */
       disasters: {
+        type: "disasters",
         title: "Tambah Laporan Bencana",
         fields: [
           { key: "title",    label: "Judul Bencana", placeholder: "cth: Banjir Bandang Desa X" },
@@ -243,6 +326,8 @@ const DashboardAdmin = () => {
         fields: [
           { key: "name",             label: "Nama Shelter" },
           { key: "location",         label: "Lokasi / Alamat" },
+          { key: "latitude", label: "Latitude", type: "number", required: false },
+          { key: "longitude", label: "Longitude", type: "number", required: false },
           { key: "capacity",         label: "Kapasitas (orang)", type: "number", default: "0" },
           { key: "current_capacity", label: "Pengungsi Saat Ini", type: "number", default: "0", required: false },
           { key: "coordinator",      label: "Nama Koordinator", required: false },
@@ -315,6 +400,7 @@ const DashboardAdmin = () => {
         <Modal
           title={modal.title}
           fields={modal.fields}
+          type={modal.type}
           onClose={() => setModal(null)}
           onSubmit={modal.onSubmit}
         />
