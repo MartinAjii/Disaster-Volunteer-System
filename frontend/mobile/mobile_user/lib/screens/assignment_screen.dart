@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../core/services/assignment_service.dart';
+import 'report_form_screen.dart';
 
-class AssignmentScreen
-    extends StatefulWidget {
+class AssignmentScreen extends StatefulWidget {
 
   const AssignmentScreen({
     super.key,
@@ -124,31 +123,73 @@ class _AssignmentScreenState
 
                 const SizedBox(height: 12),
 
-                Container(
+                Row(
 
-                  padding:
-                      const EdgeInsets
-                          .symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  mainAxisAlignment:
+                      MainAxisAlignment
+                          .spaceBetween,
 
-                  decoration:
-                      BoxDecoration(
-                    color: Colors.orange,
+                  children: [
 
-                    borderRadius:
-                        BorderRadius
-                            .circular(
-                                20),
-                  ),
+                    Container(
 
-                  child: Text(
-                    assignment[
-                            "assignment_status"] ??
-                        "-",
-                  ),
-                ),
+                      padding:
+                          const EdgeInsets
+                              .symmetric(
+
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color: Colors.orange,
+
+                        borderRadius:
+                            BorderRadius
+                                .circular(
+                                    20),
+                      ),
+
+                      child: Text(
+
+                        assignment[
+                                "assignment_status"] ??
+                            "-",
+                      ),
+                    ),
+
+                    ElevatedButton.icon(
+
+                      onPressed: () {
+
+                        Navigator.push(
+
+                          context,
+
+                          MaterialPageRoute(
+
+                            builder: (_) =>
+                                ReportFormScreen(
+                              assignment:
+                                  assignment,
+                            ),
+                          ),
+                        );
+                      },
+
+                      icon: const Icon(
+                        Icons.description,
+                        size: 18,
+                      ),
+
+                      label: const Text(
+                        "Laporan",
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),

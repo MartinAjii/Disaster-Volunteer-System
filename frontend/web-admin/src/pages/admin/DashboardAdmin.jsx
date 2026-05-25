@@ -43,14 +43,14 @@ const DashboardAdmin = () => {
   const [mapView, setMapView] = useState(null);
 
   const getUser = () => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = sessionStorage.getItem("user");
 
     try {
       if (storedUser && storedUser !== "undefined") {
         return JSON.parse(storedUser);
       }
     } catch {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
     }
 
     return {};
@@ -114,8 +114,8 @@ const DashboardAdmin = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     navigate("/", {
       replace: true,
@@ -548,21 +548,37 @@ const DashboardAdmin = () => {
         fields: [
           {
             key: "volunteer_id",
-            label: "ID Volunteer",
-            type: "number",
+            label: "Volunteer",
+            type: "select",
+            options: volunteers
+              .filter((v) => v.availability_status === "available")
+              .map((v) => ({
+                value: v.id,
+                label: `${v.full_name}${v.skills ? ` — ${v.skills}` : ""}`,
+              })),
           },
 
           {
             key: "disaster_id",
-            label: "ID Disaster",
-            type: "number",
+            label: "Bencana",
+            type: "select",
+            options: disasters
+              .filter((d) => d.status === "active")
+              .map((d) => ({
+                value: d.id,
+                label: `${d.title} (${d.location || d.type || "-"})`,
+              })),
           },
 
           {
             key: "shelter_id",
-            label: "ID Shelter",
-            type: "number",
+            label: "Shelter",
+            type: "select",
             required: false,
+            options: shelters.map((s) => ({
+              value: s.id,
+              label: `${s.name} — ${s.location || "-"}`,
+            })),
           },
         ],
 
