@@ -78,24 +78,25 @@ const DisasterTable = ({
                     </td>
                     <td>{statusBadge(d.status)}</td>
                     <td>
-                      <div className="d-flex gap-2">
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                          flexWrap: "nowrap",
+                        }}
+                      >
                         <MapButton
                           onClick={() => onMap(d)}
-                          color="#ef4444"
+                          color="#22c55e"
                           label="Disaster"
                         />
 
-                        <button
-                          className="btn btn-warning btn-sm"
-                          onClick={() => onEdit(d)}
-                        >
+                        <button className="btn btn-light btn-sm" onClick={() => onEdit(d)}>
                           Edit
                         </button>
 
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => onDelete(d.id)}
-                        >
+                        <button className="btn btn-danger btn-sm" onClick={() => onDelete(d.id)}>
                           Hapus
                         </button>
                       </div>

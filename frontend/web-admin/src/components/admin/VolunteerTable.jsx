@@ -30,7 +30,7 @@ const VolunteerTable = ({ volunteers, loading, error, onAdd, onMap, onDelete }) 
                     <td>{v.skills || "-"}</td>
                     <td>{statusBadge(v.availability_status || v.status)}</td>
                     <td style={{ display: "flex", gap: 6 }}>
-                      <MapButton onClick={() => onMap(v)} color="#3b82f6" label="Volunteer" />
+                      <MapButton onClick={() => onMap(v)} color="#22c55e" label="Volunteer" />
                       <button
                         onClick={() => onDelete(v)}
                         title="Hapus Volunteer"
