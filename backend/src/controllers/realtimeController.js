@@ -1,3 +1,4 @@
+const { pool } = require('../config/db');
 const { getFirestore, serverTimestamp } = require('../config/firebase');
 const asyncHandler = require('../utils/asyncHandler');
 const { calculateDistanceKm } = require('../utils/distance');
@@ -10,29 +11,79 @@ function normalizeDoc(doc) {
 }
 
 const updateLocation = asyncHandler(async (req, res) => {
-  const db = getFirestore();
-  const { volunteerId } = req.params;
-  const { latitude, longitude, status = 'available', name = null } = req.body;
 
-  if (latitude === undefined || longitude === undefined) {
+  const db = getFirestore();
+
+  const { volunteerId } =
+    req.params;
+
+  const {
+    latitude,
+    longitude,
+    status = 'available'
+  } = req.body;
+
+  if (
+    latitude === undefined ||
+    longitude === undefined
+  ) {
+
     return res.status(400).json({
+
       success: false,
-      message: 'Latitude dan longitude wajib diisi'
+
+      message:
+        'Latitude dan longitude wajib diisi'
     });
   }
 
-  await db.collection('realtime_locations').doc(String(volunteerId)).set({
-    volunteer_id: Number(volunteerId),
-    name,
-    latitude: Number(latitude),
-    longitude: Number(longitude),
-    status,
-    updated_at: serverTimestamp()
-  }, { merge: true });
+  // ambil data volunteer dari mysql
+  const [rows] =
+    await pool.execute(
+
+      `SELECT full_name
+       FROM volunteers
+       WHERE user_id = ?`,
+
+      [volunteerId]
+    );
+
+  const volunteer =
+    rows[0];
+
+  await db
+    .collection(
+      'realtime_locations'
+    )
+    .doc(String(volunteerId))
+    .set({
+
+      volunteer_id:
+        Number(volunteerId),
+
+      name:
+        volunteer?.full_name ||
+        'Relawan',
+
+      latitude:
+        Number(latitude),
+
+      longitude:
+        Number(longitude),
+
+      status,
+
+      updated_at:
+        serverTimestamp()
+
+    }, { merge: true });
 
   res.json({
+
     success: true,
-    message: 'Lokasi realtime relawan berhasil diperbarui'
+
+    message:
+      'Lokasi realtime relawan berhasil diperbarui'
   });
 });
 

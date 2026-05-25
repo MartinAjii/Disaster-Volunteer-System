@@ -1,15 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/services/realtime_service.dart';
 
 class MapScreen extends StatefulWidget {
 
-  const MapScreen({super.key});
+  const MapScreen({
+    super.key,
+  });
 
   @override
   State<MapScreen> createState() =>
@@ -28,10 +32,13 @@ class _MapScreenState
   StreamSubscription<Position>?
       positionStream;
 
+  Timer? locationTimer;
+
   bool isLoading = true;
 
   @override
   void initState() {
+
     super.initState();
 
     initializeLocation();
@@ -70,6 +77,7 @@ class _MapScreenState
 
     if (permission ==
         LocationPermission.deniedForever) {
+
       return;
     }
 
@@ -98,7 +106,9 @@ class _MapScreenState
     final userString =
         prefs.getString("user");
 
-    if (userString == null) return;
+    if (userString == null) {
+      return;
+    }
 
     final user =
         jsonDecode(userString);
@@ -106,53 +116,65 @@ class _MapScreenState
     final volunteerId =
         user["id"];
 
-    positionStream =
-        Geolocator
-            .getPositionStream(
+    // update posisi realtime tiap 5 detik
+    locationTimer =
+        Timer.periodic(
 
-      locationSettings:
-          const LocationSettings(
+      const Duration(seconds: 3),
 
-        accuracy:
-            LocationAccuracy.high,
+      (_) async {
 
-        distanceFilter: 10,
-      ),
-    ).listen(
+        try {
 
-      (Position position)
-      async {
+          Position position =
+              await Geolocator
+                  .getCurrentPosition(
 
-        setState(() {
-
-          currentPosition = LatLng(
-            position.latitude,
-            position.longitude,
+            desiredAccuracy:
+                LocationAccuracy.high,
           );
-        });
 
-        await RealtimeService
-            .updateLocation(
+          if (!mounted) return;
 
-          volunteerId:
-              volunteerId,
+          setState(() {
 
-          latitude:
+            currentPosition = LatLng(
               position.latitude,
-
-          longitude:
               position.longitude,
-        );
+            );
+          });
 
-        print(
-          "Realtime location updated",
-        );
+          await RealtimeService
+              .updateLocation(
+
+            volunteerId:
+                volunteerId,
+
+            latitude:
+                position.latitude,
+
+            longitude:
+                position.longitude,
+          );
+
+          print(
+            "Realtime location updated",
+          );
+
+        } catch (e) {
+
+          print(
+            "Location update error: $e",
+          );
+        }
       },
     );
   }
 
   @override
   void dispose() {
+
+    locationTimer?.cancel();
 
     positionStream?.cancel();
 
@@ -165,6 +187,7 @@ class _MapScreenState
     if (isLoading) {
 
       return const Center(
+
         child:
             CircularProgressIndicator(),
       );
