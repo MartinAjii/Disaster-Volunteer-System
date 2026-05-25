@@ -22,6 +22,7 @@ import ShelterTable from "../../components/admin/ShelterTable";
 import AssignmentTable from "../../components/admin/AssignmentTable";
 import FormModal from "../../components/admin/FormModal";
 import MapViewModal from "../../components/admin/MapViewModal";
+import ReportModal from "../../components/admin/ReportModal";
 
 import "../../index.css";
 
@@ -588,7 +589,7 @@ const DashboardAdmin = () => {
 
   return (
     <>
-      {modal && (
+      {modal && modal.type !== "report" && (
         <FormModal
           title={modal.title}
           fields={modal.fields}
@@ -596,6 +597,13 @@ const DashboardAdmin = () => {
           initialData={modal.initialData}
           onClose={() => setModal(null)}
           onSubmit={modal.onSubmit}
+        />
+      )}
+
+      {modal && modal.type === "report" && (
+        <ReportModal
+          assignment={modal.assignment}
+          onClose={() => setModal(null)}
         />
       )}
 
@@ -700,9 +708,20 @@ const DashboardAdmin = () => {
             assignments={assignments}
             loading={loading}
             error={error}
-            onAdd={() =>
-              openModal("assignments")
-            }
+            onAdd={() => openModal("assignments")}
+
+            onViewReport={(assignment) => {
+
+              setModal({
+
+                type: "report",
+
+                title: "Laporan Volunteer",
+
+                assignment
+
+              });
+            }}
           />
         )}
 

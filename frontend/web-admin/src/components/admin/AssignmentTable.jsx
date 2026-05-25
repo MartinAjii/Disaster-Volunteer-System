@@ -1,7 +1,7 @@
 import StateDisplay from "./StateDisplay";
 import { statusBadge } from "./badges";
 
-const AssignmentTable = ({ assignments, loading, error, onAdd }) => {
+const AssignmentTable = ({ assignments, loading, error, onAdd, onViewReport }) => {
   const state = <StateDisplay loading={loading} error={error} data={assignments} />;
 
   return (
@@ -18,7 +18,7 @@ const AssignmentTable = ({ assignments, loading, error, onAdd }) => {
           <div className="table-responsive">
             <table className="table">
               <thead>
-                <tr><th>ID</th><th>Volunteer</th><th>Bencana</th><th>Lokasi</th><th>Shelter</th><th>Status</th></tr>
+                <tr><th>ID</th><th>Volunteer</th><th>Bencana</th><th>Lokasi</th><th>Shelter</th><th>Status</th><th>Aksi</th></tr>
               </thead>
               <tbody>
                 {assignments.map((a, i) => (
@@ -29,6 +29,16 @@ const AssignmentTable = ({ assignments, loading, error, onAdd }) => {
                     <td>{a.disaster_location || "-"}</td>
                     <td>{a.shelter_name || "-"}</td>
                     <td>{statusBadge(a.assignment_status || a.status)}</td>
+                    <td>
+                      <button 
+                        className="btn btn-sm btn-info" 
+                        onClick={() => onViewReport(a)}
+                        title="Lihat laporan volunteer"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        <i className="fas fa-file-alt"></i> Laporan
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
