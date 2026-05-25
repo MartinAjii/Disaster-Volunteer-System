@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const bcrypt = require('bcryptjs');
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 
 async function seedAdmin() {
   const name = 'Admin BNPB';
@@ -9,7 +9,7 @@ async function seedAdmin() {
   const password = 'admin12345';
   const role = 'admin';
 
-  const [rows] = await pool.execute(
+  const rows = await query(
     'SELECT id FROM users WHERE email = ?',
     [email]
   );

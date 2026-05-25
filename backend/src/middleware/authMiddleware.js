@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 
 async function authMiddleware(req, res, next) {
   try {
@@ -16,10 +16,10 @@ async function authMiddleware(req, res, next) {
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'default_secret'
+      process.env.JWT_SECRET
     );
 
-    const [rows] = await pool.execute(
+    const rows = await query(
       'SELECT id, name, email, role, phone FROM users WHERE id = ?',
       [decoded.id]
     );

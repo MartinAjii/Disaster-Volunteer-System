@@ -1,12 +1,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 
 function signToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'default_secret',
+    process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
   );
 }
@@ -27,8 +27,8 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  const [rows] =
-    await pool.execute(
+  const rows =
+    await query(
 
       'SELECT * FROM users WHERE email = ?',
 
@@ -67,8 +67,8 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  const [volunteerRows] =
-    await pool.execute(
+  const volunteerRows =
+    await query(
 
       `SELECT *
        FROM volunteers
@@ -118,7 +118,7 @@ const profile = asyncHandler(async (req, res) => {
   let volunteer = null;
 
   if (req.user.role === 'volunteer') {
-    const [rows] = await pool.execute('SELECT * FROM volunteers WHERE user_id = ?', [req.user.id]);
+    const rows = await query('SELECT * FROM volunteers WHERE user_id = ?', [req.user.id]);
     volunteer = rows[0] || null;
   }
 

@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 
 const createDisaster = asyncHandler(async (req, res) => {
@@ -21,7 +21,7 @@ const createDisaster = asyncHandler(async (req, res) => {
     });
   }
 
-  const [result] = await pool.execute(
+  const result = await query(
     `INSERT INTO disasters
      (title, type, description, location, latitude, longitude, severity, disaster_date, status)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -63,7 +63,7 @@ const getDisasters = asyncHandler(async (req, res) => {
 
   sql += ' ORDER BY id ASC';
 
-  const [rows] = await pool.execute(sql, params);
+  const rows = await query(sql, params);
 
   res.json({
     success: true,
@@ -73,7 +73,7 @@ const getDisasters = asyncHandler(async (req, res) => {
 });
 
 const getDisasterById = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     'SELECT * FROM disasters WHERE id = ?',
     [req.params.id]
   );
@@ -105,7 +105,7 @@ const updateDisaster = asyncHandler(async (req, res) => {
     status = 'active'
   } = req.body;
 
-  const [result] = await pool.execute(
+  const result = await query(
     `UPDATE disasters
      SET title = ?, type = ?, description = ?, location = ?, latitude = ?, longitude = ?, severity = ?, disaster_date = ?, status = ?
      WHERE id = ?`,
@@ -126,7 +126,7 @@ const updateDisaster = asyncHandler(async (req, res) => {
 });
 
 const deleteDisaster = asyncHandler(async (req, res) => {
-  const [result] = await pool.execute(
+  const result = await query(
     'DELETE FROM disasters WHERE id = ?',
     [req.params.id]
   );

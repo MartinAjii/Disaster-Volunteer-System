@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 
 const createShelter = asyncHandler(async (req, res) => {
@@ -20,7 +20,7 @@ const createShelter = asyncHandler(async (req, res) => {
     });
   }
 
-  const [result] = await pool.execute(
+  const result = await query(
     `INSERT INTO shelters
      (name, location, latitude, longitude, capacity, current_capacity, coordinator, contact)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -45,7 +45,7 @@ const createShelter = asyncHandler(async (req, res) => {
 });
 
 const getShelters = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     'SELECT * FROM shelters ORDER BY id ASC'
   );
 
@@ -57,7 +57,7 @@ const getShelters = asyncHandler(async (req, res) => {
 });
 
 const getShelterById = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     'SELECT * FROM shelters WHERE id = ?',
     [req.params.id]
   );
@@ -88,7 +88,7 @@ const updateShelter = asyncHandler(async (req, res) => {
     contact = null
   } = req.body;
 
-  const [result] = await pool.execute(
+  const result = await query(
     `UPDATE shelters
      SET name = ?, location = ?, latitude = ?, longitude = ?, capacity = ?, current_capacity = ?, coordinator = ?, contact = ?
      WHERE id = ?`,
@@ -109,7 +109,7 @@ const updateShelter = asyncHandler(async (req, res) => {
 });
 
 const deleteShelter = asyncHandler(async (req, res) => {
-  const [result] = await pool.execute(
+  const result = await query(
     'DELETE FROM shelters WHERE id = ?',
     [req.params.id]
   );

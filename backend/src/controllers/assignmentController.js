@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 
 const createAssignment = asyncHandler(async (req, res) => {
@@ -97,7 +97,7 @@ const getAssignments = asyncHandler(async (req, res) => {
 
   sql += ' ORDER BY a.id ASC';
 
-  const [rows] = await pool.execute(sql, params);
+  const rows = await query(sql, params);
 
   res.json({
     success: true,
@@ -107,7 +107,7 @@ const getAssignments = asyncHandler(async (req, res) => {
 });
 
 const getAssignmentById = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     `SELECT
       a.*,
       v.full_name AS volunteer_name,
@@ -146,7 +146,7 @@ const updateAssignment = asyncHandler(async (req, res) => {
     completed_at = null
   } = req.body;
 
-  const [result] = await pool.execute(
+  const result = await query(
     `UPDATE assignments
      SET volunteer_id = ?, disaster_id = ?, shelter_id = ?, assignment_status = ?, notes = ?, completed_at = ?
      WHERE id = ?`,
@@ -228,7 +228,7 @@ const updateAssignmentStatus = asyncHandler(async (req, res) => {
 });
 
 const deleteAssignment = asyncHandler(async (req, res) => {
-  const [result] = await pool.execute(
+  const result = await query(
     'DELETE FROM assignments WHERE id = ?',
     [req.params.id]
   );

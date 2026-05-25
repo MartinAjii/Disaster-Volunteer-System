@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 const { uploadBuffer } = require('../config/storage');
 const asyncHandler = require('../utils/asyncHandler');
 
@@ -29,7 +29,7 @@ const createReport = asyncHandler(async (req, res) => {
     }
   }
 
-  const [result] = await pool.execute(
+  const result = await query(
     `INSERT INTO reports
      (assignment_id, volunteer_id, disaster_id, title, content, photo_url, report_status)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -84,7 +84,7 @@ const getReports = asyncHandler(async (req, res) => {
 
   sql += ' ORDER BY r.id ASC';
 
-  const [rows] = await pool.execute(sql, params);
+  const rows = await query(sql, params);
 
   res.json({
     success: true,
@@ -94,7 +94,7 @@ const getReports = asyncHandler(async (req, res) => {
 });
 
 const getReportById = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     `SELECT
       r.*,
       v.full_name AS volunteer_name,
@@ -140,7 +140,7 @@ const updateReport = asyncHandler(async (req, res) => {
     }
   }
 
-  const [result] = await pool.execute(
+  const result = await query(
     `UPDATE reports
      SET assignment_id = ?, volunteer_id = ?, disaster_id = ?, title = ?, content = ?, photo_url = ?, report_status = ?
      WHERE id = ?`,
@@ -161,7 +161,7 @@ const updateReport = asyncHandler(async (req, res) => {
 });
 
 const deleteReport = asyncHandler(async (req, res) => {
-  const [result] = await pool.execute(
+  const result = await query(
     'DELETE FROM reports WHERE id = ?',
     [req.params.id]
   );

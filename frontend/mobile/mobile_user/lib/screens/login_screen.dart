@@ -79,9 +79,7 @@ class _LoginScreenState
 
       await AuthService
           .saveAuthData(
-
         token,
-
         user,
       );
 

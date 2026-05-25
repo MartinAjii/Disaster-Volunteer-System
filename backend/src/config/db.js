@@ -1,4 +1,5 @@
-const mysql = require('mysql2/promise');
+const mysql =
+require('mysql2/promise');
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -6,21 +7,53 @@ const pool = mysql.createPool({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'disaster_volunteer_db',
+
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
+  queueLimit: 0
 });
 
 async function testConnection() {
+
   try {
-    const connection = await pool.getConnection();
-    console.log('MySQL connected');
+
+    const connection =
+      await pool.getConnection();
+
+    console.log(
+      'MySQL connected'
+    );
+
     connection.release();
+
   } catch (error) {
-    console.error('MySQL connection failed:', error.message);
+
+    console.error(
+      'MySQL connection failed:',
+      error.message
+    );
   }
 }
 
-module.exports = { pool, testConnection };
+async function query(
+  sql,
+  params = []
+) {
+
+  const [rows] =
+    await pool.execute(
+      sql,
+      params
+    );
+
+  return rows;
+}
+
+module.exports = {
+
+  pool,
+
+  query,
+
+  testConnection
+};

@@ -109,6 +109,9 @@ class AuthService {
     final prefs =
         await SharedPreferences.getInstance();
 
+    print("TOKEN DISIMPAN:");
+    print(token);
+
     await prefs.setString(
       "token",
       token,
@@ -134,6 +137,9 @@ class AuthService {
 
     final prefs =
         await SharedPreferences.getInstance();
+
+    print("TOKEN DIAMBIL:");
+    print(prefs.getString("token"));
 
     await prefs.clear();
   }

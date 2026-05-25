@@ -1,4 +1,4 @@
-const { pool } = require('../config/db');
+const { pool, query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 
 const createVolunteer = asyncHandler(async (req, res) => {
@@ -20,7 +20,7 @@ const createVolunteer = asyncHandler(async (req, res) => {
     });
   }
 
-  const [result] = await pool.execute(
+  const result = await query(
     `INSERT INTO volunteers
      (user_id, full_name, phone, address, skills, availability_status, latitude, longitude)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -67,7 +67,7 @@ const getVolunteers = asyncHandler(async (req, res) => {
 
   sql += ' ORDER BY v.id ASC';
 
-  const [rows] = await pool.execute(sql, params);
+  const rows = await query(sql, params);
 
   res.json({
     success: true,
@@ -77,7 +77,7 @@ const getVolunteers = asyncHandler(async (req, res) => {
 });
 
 const getVolunteerById = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     `SELECT v.*, u.email, u.role
      FROM volunteers v
      LEFT JOIN users u ON v.user_id = u.id
@@ -110,7 +110,7 @@ const updateVolunteer = asyncHandler(async (req, res) => {
     longitude = null
   } = req.body;
 
-  const [result] = await pool.execute(
+  const result = await query(
     `UPDATE volunteers
      SET full_name = ?, phone = ?, address = ?, skills = ?, availability_status = ?, latitude = ?, longitude = ?
      WHERE id = ?`,
@@ -146,7 +146,7 @@ const updateAvailability = asyncHandler(async (req, res) => {
     });
   }
 
-  const [result] = await pool.execute(
+  const result = await query(
     `UPDATE volunteers
      SET availability_status = ?, latitude = COALESCE(?, latitude), longitude = COALESCE(?, longitude)
      WHERE id = ?`,
@@ -173,7 +173,7 @@ const updateAvailability = asyncHandler(async (req, res) => {
 });
 
 const getStatusLogs = asyncHandler(async (req, res) => {
-  const [rows] = await pool.execute(
+  const rows = await query(
     `SELECT * FROM volunteer_status_logs
      WHERE volunteer_id = ?
      ORDER BY logged_at DESC`,
@@ -188,7 +188,7 @@ const getStatusLogs = asyncHandler(async (req, res) => {
 });
 
 const deleteVolunteer = asyncHandler(async (req, res) => {
-  const [result] = await pool.execute(
+  const result = await query(
     'DELETE FROM volunteers WHERE id = ?',
     [req.params.id]
   );
