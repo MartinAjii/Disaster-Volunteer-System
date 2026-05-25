@@ -105,7 +105,7 @@ const LocationPicker = ({ form, setForm }) => {
           <Marker position={[form.latitude, form.longitude]} />
         )}
       </MapContainer>
-      <small style={{ color: "#64748b" }}>Klik titik lokasi bencana pada peta.</small>
+      <small style={{ color: "#64748b" }}>Klik titik lokasi pada peta.</small>
     </div>
   );
 };
@@ -518,7 +518,10 @@ const Modal = ({ title, fields, onClose, onSubmit, type }) => {
         )}
 
         <form onSubmit={handleSubmit}>
-          {type === "disasters" && <LocationPicker form={form} setForm={setForm} />}
+          {/* LocationPicker tampil untuk disasters DAN shelters */}
+          {(type === "disasters" || type === "shelters") && (
+            <LocationPicker form={form} setForm={setForm} />
+          )}
           {fields.map((f) => (
             <div key={f.key} style={{ marginBottom: 14 }}>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 5, color: "#475569" }}>
@@ -686,7 +689,7 @@ const DashboardAdmin = () => {
         fields: [
           { key: "title",    label: "Judul Bencana", placeholder: "cth: Banjir Bandang Desa X" },
           { key: "location", label: "Lokasi" },
-            { key: "latitude", label: "Latitude", type: "number", required: false },
+          { key: "latitude", label: "Latitude", type: "number", required: false },
           { key: "longitude", label: "Longitude", type: "number", required: false },
           { key: "type",     label: "Jenis Bencana", type: "select",
             options: ["Banjir", "Gempa", "Longsor", "Kebakaran", "Tsunami", "Angin Puting Beliung", "Lainnya"] },
@@ -700,6 +703,7 @@ const DashboardAdmin = () => {
         onSubmit: async (form) => { await postData(DISASTERS_URL, form); setModal(null); fetchData(); },
       },
       shelters: {
+        type: "shelters", // ← ditambahkan agar LocationPicker muncul
         title: "Tambah Shelter / Posko",
         fields: [
           { key: "name",             label: "Nama Shelter" },
@@ -899,7 +903,6 @@ const DashboardAdmin = () => {
                           <td>{v.skills || "-"}</td>
                           <td>{statusBadge(v.availability_status || v.status)}</td>
                           <td>
-                            {/* Volunteer: tombol lacak lokasi realtime */}
                             <MapBtn
                               onClick={() => setMapView({ data: v, type: "volunteer" })}
                               color="#3b82f6"
