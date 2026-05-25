@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../assignment/assignment_screen.dart';
-import '../disaster/disaster_screen.dart';
-import '../profile/profile_screen.dart';
+import './assignment_screen.dart';
+import './disaster_screen.dart';
+import './profile_screen.dart';
+import './map_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
 
@@ -19,11 +20,9 @@ class _DashboardScreenState
   int currentIndex = 0;
 
   final pages = [
-
     const DisasterScreen(),
-
     const AssignmentScreen(),
-
+    const MapScreen(),
     const ProfileScreen(),
   ];
 
@@ -76,6 +75,11 @@ class _DashboardScreenState
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: "Tugas",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: "Map",
           ),
 
           BottomNavigationBarItem(

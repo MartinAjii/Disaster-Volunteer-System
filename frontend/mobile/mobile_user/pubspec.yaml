@@ -52,6 +52,12 @@ dev_dependencies:
 
   shared_preferences: ^2.2.3
 
+  flutter_map: ^6.1.0
+
+  latlong2: ^0.9.1
+
+  geolocator: ^11.0.0
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
