@@ -27,7 +27,6 @@ const ShelterTable = ({ shelters, loading, error, onAdd, onMap }) => {
                     <td>{s.name}</td>
                     <td>{s.location}</td>
                     <td>{s.capacity}</td>
-                    <td>{s.current_capacity ?? "-"}</td>
                     <td>{s.coordinator || "-"}</td>
                     <td>
                       <MapButton onClick={() => onMap(s)} color="#22c55e" label="Shelter" />

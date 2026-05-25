@@ -22,9 +22,9 @@ const createShelter = asyncHandler(async (req, res) => {
 
   const result = await query(
     `INSERT INTO shelters
-     (name, location, latitude, longitude, capacity, current_capacity, coordinator, contact)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [name, location, latitude, longitude, capacity, current_capacity, coordinator, contact]
+     (name, location, latitude, longitude, capacity, current_capacity, status, coordinator, contact)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, location, latitude, longitude, capacity, current_capacity, status, coordinator, contact]
   );
 
   res.status(201).json({
@@ -38,6 +38,7 @@ const createShelter = asyncHandler(async (req, res) => {
       longitude,
       capacity,
       current_capacity,
+      status,
       coordinator,
       contact
     }
