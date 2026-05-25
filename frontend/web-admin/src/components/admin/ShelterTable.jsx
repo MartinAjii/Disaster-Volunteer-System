@@ -65,7 +65,7 @@ const ShelterTable = ({ shelters, loading, error, onAdd, onMap, onEdit, onDelete
                           onClick={() => onEdit(s)}
                           title="Edit"
                         >
-                          <i className="fas fa-pencil-alt"></i>
+                          <i className="fas fa-pencil-alt"></i> Edit
                         </button>
                         <button
                           className="btn btn-sm"
@@ -73,7 +73,7 @@ const ShelterTable = ({ shelters, loading, error, onAdd, onMap, onEdit, onDelete
                           onClick={() => onDelete(s.id)}
                           title="Hapus"
                         >
-                          <i className="fas fa-trash"></i>
+                          <i className="fas fa-trash"></i> Hapus
                         </button>
                       </div>
                     </td>
