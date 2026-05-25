@@ -67,7 +67,7 @@ const createReport = asyncHandler(async (req, res) => {
 });
 
 const getReports = asyncHandler(async (req, res) => {
-  const { disaster_id, volunteer_id, status } = req.query;
+  const { assignment_id, disaster_id, volunteer_id, status } = req.query;
   const params = [];
 
   let sql = `
@@ -80,6 +80,11 @@ const getReports = asyncHandler(async (req, res) => {
     JOIN disasters d ON r.disaster_id = d.id
     WHERE 1 = 1
   `;
+
+  if (assignment_id) {
+    sql += ' AND r.assignment_id = ?';
+    params.push(assignment_id);
+  }
 
   if (disaster_id) {
     sql += ' AND r.disaster_id = ?';

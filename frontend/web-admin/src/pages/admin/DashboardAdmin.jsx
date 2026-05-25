@@ -22,6 +22,7 @@ import ShelterTable from "../../components/admin/ShelterTable";
 import AssignmentTable from "../../components/admin/AssignmentTable";
 import FormModal from "../../components/admin/FormModal";
 import MapViewModal from "../../components/admin/MapViewModal";
+import ReportModal from "../../components/admin/ReportModal";
 
 import "../../index.css";
 
@@ -58,25 +59,67 @@ const DashboardAdmin = () => {
   const user = getUser();
 
   const menus = [
-    { key: "dashboard", icon: "fas fa-chart-line", label: "Dashboard" },
-    { key: "volunteers", icon: "fas fa-users", label: "Volunteers" },
-    { key: "disasters", icon: "fas fa-fire", label: "Disasters" },
-    { key: "shelters", icon: "fas fa-home", label: "Shelters" },
-    { key: "assignments", icon: "fas fa-tasks", label: "Assignments" },
+    {
+      key: "dashboard",
+      icon: "fas fa-chart-line",
+      label: "Dashboard",
+    },
+    {
+      key: "volunteers",
+      icon: "fas fa-users",
+      label: "Volunteers",
+    },
+    {
+      key: "disasters",
+      icon: "fas fa-fire",
+      label: "Disasters",
+    },
+    {
+      key: "shelters",
+      icon: "fas fa-home",
+      label: "Shelters",
+    },
+    {
+      key: "assignments",
+      icon: "fas fa-tasks",
+      label: "Assignments",
+    },
   ];
 
   const sectionTitles = {
-    dashboard: { title: "Dashboard", sub: "Ringkasan data sistem" },
-    volunteers: { title: "Volunteer Management", sub: "Kelola data relawan" },
-    disasters: { title: "Disaster Reports", sub: "Data laporan bencana" },
-    shelters: { title: "Shelter Management", sub: "Data shelter / posko" },
-    assignments: { title: "Assignments", sub: "Penugasan relawan" },
+    dashboard: {
+      title: "Dashboard",
+      sub: "Ringkasan data sistem",
+    },
+
+    volunteers: {
+      title: "Volunteer Management",
+      sub: "Kelola data relawan",
+    },
+
+    disasters: {
+      title: "Disaster Reports",
+      sub: "Data laporan bencana",
+    },
+
+    shelters: {
+      title: "Shelter Management",
+      sub: "Data shelter / posko",
+    },
+
+    assignments: {
+      title: "Assignments",
+      sub: "Penugasan relawan",
+    },
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/", { replace: true });
+
+    navigate("/", {
+      replace: true,
+    });
   };
 
   const fetchData = async () => {
@@ -85,6 +128,7 @@ const DashboardAdmin = () => {
       setError("");
 
       const headers = authHeaders();
+
       const [vRes, dRes, sRes, aRes] = await Promise.all([
         fetch(`${API_URL}/volunteers`, { headers }),
         fetch(`${API_URL}/disasters`, { headers }),
@@ -94,8 +138,13 @@ const DashboardAdmin = () => {
 
       const parse = async (res) => {
         const json = await res.json();
+
         if (Array.isArray(json)) return json;
-        if (json.data && Array.isArray(json.data)) return json.data;
+
+        if (json.data && Array.isArray(json.data)) {
+          return json.data;
+        }
+
         return [];
       };
 
@@ -103,10 +152,18 @@ const DashboardAdmin = () => {
       setDisasters(await parse(dRes));
       setShelters(await parse(sRes));
       setAssignments(await parse(aRes));
+
     } catch (err) {
-      setError(err.message || "Gagal mengambil data dari server");
+
+      setError(
+        err.message ||
+        "Gagal mengambil data dari server"
+      );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
@@ -115,24 +172,34 @@ const DashboardAdmin = () => {
   }, []);
 
   useEffect(() => {
+
     const unsubscribe = onSnapshot(
       collection(db, "realtime_locations"),
+
       (snapshot) => {
+
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
+
         setRealtimeLocations(data);
       },
+
       (error) => {
-        console.error("Firebase realtime error:", error);
+        console.error(
+          "Firebase realtime error:",
+          error
+        );
       }
     );
 
     return () => unsubscribe();
+
   }, []);
 
   const postData = async (url, body) => {
+
     const res = await fetch(url, {
       method: "POST",
       headers: authHeaders(),
@@ -142,113 +209,376 @@ const DashboardAdmin = () => {
     const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      throw new Error(json.message || "Gagal menyimpan data");
+      throw new Error(
+        json.message || "Gagal menyimpan data"
+      );
     }
 
     return json;
   };
 
+  const deleteData = async (url) => {
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+
+    const json = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(
+        json.message || "Gagal menghapus data"
+      );
+    }
+
+    return json;
+  };
+
+  // ─────────────────────────────
+  // DELETE VOLUNTEER
+  // ─────────────────────────────
+  const handleDeleteVolunteer = async (id) => {
+
+    const confirmDelete = window.confirm(
+      "Yakin ingin menghapus volunteer ini?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await deleteData(
+        `${VOLUNTEERS_URL}/${id}`
+      );
+
+      fetchData();
+
+    } catch (err) {
+
+      alert(err.message);
+
+    }
+  };
+
+  // ─────────────────────────────
+  // EDIT DISASTER
+  // ─────────────────────────────
+  const openEditDisaster = (disaster) => {
+
+    setModal({
+
+      type: "disasters",
+
+      title: "Edit Disaster",
+
+      initialData: disaster,
+
+      fields: [
+
+        {
+          key: "title",
+          label: "Judul Bencana",
+        },
+
+        {
+          key: "location",
+          label: "Lokasi",
+        },
+
+        {
+          key: "latitude",
+          label: "Latitude",
+          type: "number",
+          required: false,
+        },
+
+        {
+          key: "longitude",
+          label: "Longitude",
+          type: "number",
+          required: false,
+        },
+
+        {
+          key: "type",
+          label: "Jenis Bencana",
+          type: "select",
+          options: [
+            "Banjir",
+            "Gempa",
+            "Longsor",
+            "Kebakaran",
+            "Tsunami",
+            "Angin Puting Beliung",
+            "Lainnya",
+          ],
+        },
+
+        {
+          key: "severity",
+          label: "Tingkat Keparahan",
+          type: "select",
+          options: [
+            "low",
+            "medium",
+            "high",
+            "critical",
+          ],
+        },
+
+        {
+          key: "disaster_date",
+          label: "Tanggal Kejadian",
+          type: "date",
+        },
+
+        {
+          key: "description",
+          label: "Deskripsi",
+          type: "textarea",
+          required: false,
+        },
+
+        {
+          key: "status",
+          label: "Status",
+          type: "select",
+          options: [
+            "active",
+            "handled",
+            "closed",
+          ],
+        },
+      ],
+
+      onSubmit: async (form) => {
+
+        const res = await fetch(
+          `${DISASTERS_URL}/${disaster.id}`,
+          {
+            method: "PUT",
+            headers: authHeaders(),
+            body: JSON.stringify(form),
+          }
+        );
+
+        const json = await res.json();
+
+        if (!res.ok) {
+          throw new Error(
+            json.message ||
+            "Gagal update disaster"
+          );
+        }
+
+        setModal(null);
+
+        fetchData();
+      },
+    });
+  };
+
   const openModal = (section) => {
+
     const configs = {
+
       volunteers: {
         title: "Tambah Volunteer",
+
         fields: [
-          { key: "full_name", label: "Nama Lengkap" },
-          { key: "phone", label: "Nomor Telepon", required: false, placeholder: "08xxxxxxxxxx" },
-          { key: "address", label: "Alamat", type: "textarea", required: false },
-          { key: "skills", label: "Keahlian", required: false, placeholder: "cth: P3K, Evakuasi" },
+          {
+            key: "full_name",
+            label: "Nama Lengkap",
+          },
+
+          {
+            key: "phone",
+            label: "Nomor Telepon",
+            required: false,
+            placeholder: "08xxxxxxxxxx",
+          },
+
+          {
+            key: "address",
+            label: "Alamat",
+            type: "textarea",
+            required: false,
+          },
+
+          {
+            key: "skills",
+            label: "Keahlian",
+            required: false,
+            placeholder:
+              "cth: P3K, Evakuasi",
+          },
+
           {
             key: "availability_status",
             label: "Status Ketersediaan",
             type: "select",
             default: "available",
-            options: ["available", "assigned", "unavailable"],
+
+            options: [
+              "available",
+              "assigned",
+              "unavailable",
+            ],
           },
         ],
+
         onSubmit: async (form) => {
-          await postData(VOLUNTEERS_URL, form);
+
+          await postData(
+            VOLUNTEERS_URL,
+            form
+          );
+
           setModal(null);
+
           fetchData();
         },
       },
 
       disasters: {
         type: "disasters",
+
         title: "Tambah Laporan Bencana",
+
         fields: [
-          { key: "title", label: "Judul Bencana", placeholder: "cth: Banjir Bandang Desa X" },
-          { key: "location", label: "Lokasi" },
-          { key: "latitude", label: "Latitude", type: "number", required: false },
-          { key: "longitude", label: "Longitude", type: "number", required: false },
           {
-            key: "type",
-            label: "Jenis Bencana",
-            type: "select",
-            options: ["Banjir", "Gempa", "Longsor", "Kebakaran", "Tsunami", "Angin Puting Beliung", "Lainnya"],
+            key: "title",
+            label: "Judul Bencana",
           },
+
           {
-            key: "severity",
-            label: "Tingkat Keparahan",
-            type: "select",
-            default: "medium",
-            options: ["low", "medium", "high", "critical"],
+            key: "location",
+            label: "Lokasi",
           },
-          { key: "disaster_date", label: "Tanggal Kejadian", type: "date" },
-          { key: "description", label: "Deskripsi", type: "textarea", required: false },
+
           {
-            key: "status",
-            label: "Status",
-            type: "select",
-            default: "active",
-            options: ["active", "handled", "closed"],
+            key: "latitude",
+            label: "Latitude",
+            type: "number",
+            required: false,
+          },
+
+          {
+            key: "longitude",
+            label: "Longitude",
+            type: "number",
+            required: false,
           },
         ],
+
         onSubmit: async (form) => {
-          await postData(DISASTERS_URL, form);
+
+          await postData(
+            DISASTERS_URL,
+            form
+          );
+
           setModal(null);
+
           fetchData();
         },
       },
 
       shelters: {
         type: "shelters",
+
         title: "Tambah Shelter / Posko",
+
         fields: [
-          { key: "name", label: "Nama Shelter" },
-          { key: "location", label: "Lokasi / Alamat" },
-          { key: "latitude", label: "Latitude", type: "number", required: false },
-          { key: "longitude", label: "Longitude", type: "number", required: false },
-          { key: "capacity", label: "Kapasitas (orang)", type: "number", default: "0" },
-          { key: "current_capacity", label: "Pengungsi Saat Ini", type: "number", default: "0", required: false },
-          { key: "coordinator", label: "Nama Koordinator", required: false },
-          { key: "contact", label: "Kontak Koordinator", required: false, placeholder: "08xxxxxxxxxx" },
+          {
+            key: "name",
+            label: "Nama Shelter",
+          },
+
+          {
+            key: "location",
+            label: "Lokasi / Alamat",
+          },
+
+          {
+            key: "capacity",
+            label: "Kapasitas",
+            type: "number",
+            default: "0",
+          },
+
+          {
+            key: "current_capacity",
+            label: "Pengungsi Saat Ini",
+            type: "number",
+            default: "0",
+            required: false,
+          },
+
+          {
+            key: "coordinator",
+            label: "Nama Koordinator",
+            required: false,
+          },
+
+          {
+            key: "contact",
+            label: "Kontak",
+            required: false,
+          },
         ],
+
         onSubmit: async (form) => {
-          await postData(SHELTERS_URL, form);
+
+          await postData(
+            SHELTERS_URL,
+            form
+          );
+
           setModal(null);
+
           fetchData();
         },
       },
 
       assignments: {
         title: "Tambah Assignment",
+
         fields: [
-          { key: "volunteer_id", label: "ID Volunteer", type: "number", placeholder: "Lihat tab Volunteers untuk ID" },
-          { key: "disaster_id", label: "ID Disaster", type: "number", placeholder: "Lihat tab Disasters untuk ID" },
-          { key: "shelter_id", label: "ID Shelter (opsional)", type: "number", required: false },
           {
-            key: "assignment_status",
-            label: "Status",
-            type: "select",
-            default: "assigned",
-            options: ["assigned", "on_the_way", "on_site", "completed", "cancelled"],
+            key: "volunteer_id",
+            label: "ID Volunteer",
+            type: "number",
           },
-          { key: "notes", label: "Catatan", type: "textarea", required: false },
+
+          {
+            key: "disaster_id",
+            label: "ID Disaster",
+            type: "number",
+          },
+
+          {
+            key: "shelter_id",
+            label: "ID Shelter",
+            type: "number",
+            required: false,
+          },
         ],
+
         onSubmit: async (form) => {
-          if (!form.shelter_id) delete form.shelter_id;
-          await postData(ASSIGNMENTS_URL, form);
+
+          if (!form.shelter_id) {
+            delete form.shelter_id;
+          }
+
+          await postData(
+            ASSIGNMENTS_URL,
+            form
+          );
+
           setModal(null);
+
           fetchData();
         },
       },
@@ -259,13 +589,21 @@ const DashboardAdmin = () => {
 
   return (
     <>
-      {modal && (
+      {modal && modal.type !== "report" && (
         <FormModal
           title={modal.title}
           fields={modal.fields}
           type={modal.type}
+          initialData={modal.initialData}
           onClose={() => setModal(null)}
           onSubmit={modal.onSubmit}
+        />
+      )}
+
+      {modal && modal.type === "report" && (
+        <ReportModal
+          assignment={modal.assignment}
+          onClose={() => setModal(null)}
         />
       )}
 
@@ -286,9 +624,14 @@ const DashboardAdmin = () => {
       />
 
       <div className="main-content">
+
         <Topbar
-          title={sectionTitles[activeSection]?.title}
-          sub={sectionTitles[activeSection]?.sub}
+          title={
+            sectionTitles[activeSection]?.title
+          }
+          sub={
+            sectionTitles[activeSection]?.sub
+          }
           user={user}
         />
 
@@ -307,8 +650,16 @@ const DashboardAdmin = () => {
             volunteers={volunteers}
             loading={loading}
             error={error}
-            onAdd={() => openModal("volunteers")}
-            onMap={(v) => setMapView({ data: v, type: "volunteer" })}
+            onAdd={() =>
+              openModal("volunteers")
+            }
+            onMap={(v) =>
+              setMapView({
+                data: v,
+                type: "volunteer",
+              })
+            }
+            onDelete={handleDeleteVolunteer}
           />
         )}
 
@@ -317,8 +668,21 @@ const DashboardAdmin = () => {
             disasters={disasters}
             loading={loading}
             error={error}
-            onAdd={() => openModal("disasters")}
-            onMap={(d) => setMapView({ data: d, type: "disaster" })}
+            onAdd={() =>
+              openModal("disasters")
+            }
+            onMap={(d) =>
+              setMapView({
+                data: d,
+                type: "disaster",
+              })
+            }
+            onEdit={openEditDisaster}
+            onDelete={(id) =>
+              deleteData(
+                `${DISASTERS_URL}/${id}`
+              )
+            }
           />
         )}
 
@@ -327,8 +691,15 @@ const DashboardAdmin = () => {
             shelters={shelters}
             loading={loading}
             error={error}
-            onAdd={() => openModal("shelters")}
-            onMap={(s) => setMapView({ data: s, type: "shelter" })}
+            onAdd={() =>
+              openModal("shelters")
+            }
+            onMap={(s) =>
+              setMapView({
+                data: s,
+                type: "shelter",
+              })
+            }
           />
         )}
 
@@ -338,8 +709,22 @@ const DashboardAdmin = () => {
             loading={loading}
             error={error}
             onAdd={() => openModal("assignments")}
+
+            onViewReport={(assignment) => {
+
+              setModal({
+
+                type: "report",
+
+                title: "Laporan Volunteer",
+
+                assignment
+
+              });
+            }}
           />
         )}
+
       </div>
     </>
   );

@@ -1,9 +1,41 @@
-import StateDisplay from "./StateDisplay";
 import MapButton from "./MapButton";
-import { severityBadge, statusBadge } from "./badges";
 
-const DisasterTable = ({ disasters, loading, error, onAdd, onMap }) => {
-  const state = <StateDisplay loading={loading} error={error} data={disasters} />;
+const DisasterTable = ({
+  disasters,
+  loading,
+  error,
+  onAdd,
+  onMap,
+  onEdit,
+  onDelete,
+}) => {
+  const renderState = () => {
+    if (loading) return <div className="p-4 text-center">Memuat data...</div>;
+    if (error) return <div className="alert alert-danger">{error}</div>;
+    if (!disasters.length) return <div className="p-4 text-center">Tidak ada data</div>;
+    return null;
+  };
+
+  const severityBadge = (s) => {
+    const map = {
+      critical: "danger",
+      high: "warning",
+      medium: "primary",
+      low: "success",
+    };
+
+    return <span className={`badge bg-${map[s] || "secondary"}`}>{s || "-"}</span>;
+  };
+
+  const statusBadge = (s) => {
+    const map = {
+      active: "success",
+      handled: "warning",
+      closed: "secondary",
+    };
+
+    return <span className={`badge bg-${map[s] || "secondary"}`}>{s || "-"}</span>;
+  };
 
   return (
     <div className="card shadow-sm">
@@ -15,12 +47,22 @@ const DisasterTable = ({ disasters, loading, error, onAdd, onMap }) => {
           </button>
         </div>
 
-        {state.props.loading || state.props.error || !disasters.length ? state : (
+        {renderState() || (
           <div className="table-responsive">
             <table className="table">
               <thead>
-                <tr><th>ID</th><th>Judul</th><th>Lokasi</th><th>Jenis</th><th>Severity</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr>
+                <tr>
+                  <th>ID</th>
+                  <th>Judul</th>
+                  <th>Lokasi</th>
+                  <th>Jenis</th>
+                  <th>Severity</th>
+                  <th>Tanggal</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
               </thead>
+
               <tbody>
                 {disasters.map((d, i) => (
                   <tr key={d.id || i}>
@@ -29,10 +71,35 @@ const DisasterTable = ({ disasters, loading, error, onAdd, onMap }) => {
                     <td>{d.location}</td>
                     <td>{d.type}</td>
                     <td>{severityBadge(d.severity)}</td>
-                    <td>{d.disaster_date ? new Date(d.disaster_date).toLocaleDateString("id-ID") : "-"}</td>
+                    <td>
+                      {d.disaster_date
+                        ? new Date(d.disaster_date).toLocaleDateString("id-ID")
+                        : "-"}
+                    </td>
                     <td>{statusBadge(d.status)}</td>
                     <td>
-                      <MapButton onClick={() => onMap(d)} color="#ef4444" label="Disaster" />
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                          flexWrap: "nowrap",
+                        }}
+                      >
+                        <MapButton
+                          onClick={() => onMap(d)}
+                          color="#22c55e"
+                          label="Disaster"
+                        />
+
+                        <button className="btn btn-light btn-sm" onClick={() => onEdit(d)}>
+                          Edit
+                        </button>
+
+                        <button className="btn btn-danger btn-sm" onClick={() => onDelete(d.id)}>
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
