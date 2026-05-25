@@ -27,6 +27,18 @@ class _RegisterScreenState
       passwordController =
       TextEditingController();
 
+  final TextEditingController
+      phoneController =
+      TextEditingController();
+
+  final TextEditingController
+      addressController =
+      TextEditingController();
+
+  final TextEditingController
+      skillsController =
+      TextEditingController();
+
   bool isLoading = false;
 
   void register() async {
@@ -37,10 +49,24 @@ class _RegisterScreenState
 
     final result =
         await AuthService.register(
-      name: nameController.text,
-      email: emailController.text,
+
+      name:
+          nameController.text,
+
+      email:
+          emailController.text,
+
       password:
           passwordController.text,
+
+      phone:
+          phoneController.text,
+
+      address:
+          addressController.text,
+
+      skills:
+          skillsController.text,
     );
 
     setState(() {
@@ -172,6 +198,95 @@ class _RegisterScreenState
 
                 border:
                     OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(
+                          12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            TextField(
+
+              controller:
+                  phoneController,
+
+              decoration:
+                  InputDecoration(
+
+                labelText:
+                    "Nomor Telepon",
+
+                filled: true,
+
+                fillColor:
+                    Colors.white10,
+
+                border:
+                    OutlineInputBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(
+                          12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            TextField(
+
+              controller:
+                  addressController,
+
+              maxLines: 2,
+
+              decoration:
+                  InputDecoration(
+
+                labelText:
+                    "Alamat",
+
+                filled: true,
+
+                fillColor:
+                    Colors.white10,
+
+                border:
+                    OutlineInputBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(
+                          12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            TextField(
+
+              controller:
+                  skillsController,
+
+              decoration:
+                  InputDecoration(
+
+                labelText:
+                    "Keahlian",
+
+                hintText:
+                    "Contoh: medis, evakuasi, logistik",
+
+                filled: true,
+
+                fillColor:
+                    Colors.white10,
+
+                border:
+                    OutlineInputBorder(
+
                   borderRadius:
                       BorderRadius.circular(
                           12),

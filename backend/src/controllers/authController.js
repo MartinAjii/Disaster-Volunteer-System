@@ -142,6 +142,18 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const user = rows[0];
+  const [volunteerRows] =
+    await pool.execute(
+
+      `SELECT *
+      FROM volunteers
+      WHERE user_id = ?`,
+
+      [user.id]
+    );
+
+  const volunteer =
+    volunteerRows[0] || null;
   const valid = await bcrypt.compare(password, user.password);
 
   if (!valid) {
@@ -159,18 +171,20 @@ const login = asyncHandler(async (req, res) => {
     phone: user.phone
   };
 
-  const [volunteers] = await pool.execute(
-    'SELECT * FROM volunteers WHERE user_id = ?',
-    [user.id]
-  );
+  const token =
+  signToken(safeUser);
 
   res.json({
     success: true,
     message: 'Login berhasil',
+    token,
     data: {
-      user: safeUser,
-      volunteer: volunteers[0] || null,
-      token: signToken(safeUser)
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      volunteer: volunteer
     }
   });
 });

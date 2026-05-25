@@ -45,14 +45,24 @@ class AuthService {
 
   static Future<Map<String, dynamic>>
       register({
+
     required String name,
+
     required String email,
+
     required String password,
+
+    required String phone,
+
+    required String address,
+
+    required String skills,
   }) async {
 
     try {
 
       final response = await http.post(
+
         Uri.parse(
           "${Api.baseUrl}/auth/register",
         ),
@@ -63,13 +73,24 @@ class AuthService {
         },
 
         body: jsonEncode({
+
           "name": name,
+
           "email": email,
+
           "password": password,
+
+          "phone": phone,
+
+          "address": address,
+
+          "skills": skills,
         }),
       );
 
-      return jsonDecode(response.body);
+      return jsonDecode(
+        response.body,
+      );
 
     } catch (e) {
 
@@ -115,5 +136,120 @@ class AuthService {
         await SharedPreferences.getInstance();
 
     await prefs.clear();
+  }
+
+  static Future<Map<String, dynamic>>
+      updateProfile({
+
+    required String name,
+
+    required String phone,
+
+    required String address,
+
+    required String skills,
+  }) async {
+
+    try {
+
+      final prefs =
+          await SharedPreferences
+              .getInstance();
+
+      final token =
+          prefs.getString("token");
+
+      final response =
+          await http.put(
+
+        Uri.parse(
+          "${Api.baseUrl}/auth/profile",
+        ),
+
+        headers: {
+
+          "Content-Type":
+              "application/json",
+
+          "Authorization":
+              "Bearer $token",
+        },
+
+        body: jsonEncode({
+
+          "name": name,
+
+          "phone": phone,
+
+          "address": address,
+
+          "skills": skills,
+        }),
+      );
+
+      return jsonDecode(
+        response.body,
+      );
+
+    } catch (e) {
+
+      return {
+        "success": false,
+        "message": e.toString(),
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>>
+      getProfile()
+  async {
+
+    try {
+
+      final prefs =
+          await SharedPreferences
+              .getInstance();
+
+      final token =
+          prefs.getString("token");
+
+      final response =
+          await http.get(
+
+        Uri.parse(
+          "${Api.baseUrl}/auth/profile",
+        ),
+
+        headers: {
+
+          "Authorization":
+              "Bearer $token",
+        },
+      );
+
+      final data =
+          jsonDecode(response.body);
+
+      if (data["success"] == true) {
+
+        await prefs.setString(
+
+          "user",
+
+          jsonEncode(
+            data["data"],
+          ),
+        );
+      }
+
+      return data;
+
+    } catch (e) {
+
+      return {
+        "success": false,
+        "message": e.toString(),
+      };
+    }
   }
 }
