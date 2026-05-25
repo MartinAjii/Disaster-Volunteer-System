@@ -82,7 +82,7 @@ const getReports = asyncHandler(async (req, res) => {
     params.push(status);
   }
 
-  sql += ' ORDER BY r.created_at DESC, r.id DESC';
+  sql += ' ORDER BY r.id ASC';
 
   const [rows] = await pool.execute(sql, params);
 

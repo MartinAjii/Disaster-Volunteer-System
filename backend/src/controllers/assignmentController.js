@@ -95,7 +95,7 @@ const getAssignments = asyncHandler(async (req, res) => {
     params.push(status);
   }
 
-  sql += ' ORDER BY a.assigned_at DESC, a.id DESC';
+  sql += ' ORDER BY a.id ASC';
 
   const [rows] = await pool.execute(sql, params);
 
