@@ -304,6 +304,8 @@ const DashboardAdmin = () => {
         fields: [
           { key: "title",    label: "Judul Bencana", placeholder: "cth: Banjir Bandang Desa X" },
           { key: "location", label: "Lokasi" },
+            { key: "latitude", label: "Latitude", type: "number", required: false },
+          { key: "longitude", label: "Longitude", type: "number", required: false },
           { key: "type",     label: "Jenis Bencana", type: "select",
             options: ["Banjir", "Gempa", "Longsor", "Kebakaran", "Tsunami", "Angin Puting Beliung", "Lainnya"] },
           { key: "severity", label: "Tingkat Keparahan", type: "select", default: "medium",
@@ -326,8 +328,6 @@ const DashboardAdmin = () => {
         fields: [
           { key: "name",             label: "Nama Shelter" },
           { key: "location",         label: "Lokasi / Alamat" },
-          { key: "latitude", label: "Latitude", type: "number", required: false },
-          { key: "longitude", label: "Longitude", type: "number", required: false },
           { key: "capacity",         label: "Kapasitas (orang)", type: "number", default: "0" },
           { key: "current_capacity", label: "Pengungsi Saat Ini", type: "number", default: "0", required: false },
           { key: "coordinator",      label: "Nama Koordinator", required: false },

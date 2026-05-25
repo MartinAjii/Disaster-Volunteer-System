@@ -19,17 +19,32 @@ function LandingPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user") || "null");
+    const storedUser = localStorage.getItem("user");
+
+    let user = null;
+
+    try {
+      if (storedUser && storedUser !== "undefined") {
+        user = JSON.parse(storedUser);
+      }
+    } catch {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      user = null;
+    }
+
     if (token && user) {
-      navigate(user.role === "admin" ? "/admin/dashboard" : "/user/dashboard", { replace: true });
+      navigate(user.role === "admin" ? "/admin/dashboard" : "/user/dashboard", {
+        replace: true,
+      });
     }
   }, [navigate]);
-
   const handleLogin = async () => {
     const { email, password } = loginData;
     if (!email || !password) return showAlert("Email dan password wajib diisi.");
     setLoading(true);
     try {
+      console.log("LOGIN URL:", `${AUTH_URL}/login`);
       const res = await fetch(`${AUTH_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,9 +52,12 @@ function LandingPage() {
       });
       const data = await res.json();
       if (data.success) {
-        localStorage.setItem("token", data.data.token);
-        localStorage.setItem("user", JSON.stringify(data.data.user));
-        navigate(data.data.user.role === "admin" ? "/admin/dashboard" : "/user/dashboard", { replace: true });
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.data));
+
+        navigate(data.data.role === "admin" ? "/admin/dashboard" : "/user/dashboard", {
+          replace: true,
+        });
       } else {
         showAlert(data.message);
       }
