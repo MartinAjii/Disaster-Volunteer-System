@@ -65,7 +65,7 @@ const getVolunteers = asyncHandler(async (req, res) => {
     params.push(`%${skill}%`);
   }
 
-  sql += ' ORDER BY v.id DESC';
+  sql += ' ORDER BY v.id ASC';
 
   const [rows] = await pool.execute(sql, params);
 
