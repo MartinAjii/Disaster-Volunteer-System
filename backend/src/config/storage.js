@@ -7,7 +7,7 @@ let bucket = null;
 
 function getBucket() {
   const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET;
-
+  
   if (!bucketName) {
     return null;
   }

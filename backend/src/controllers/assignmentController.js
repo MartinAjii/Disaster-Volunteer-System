@@ -63,45 +63,86 @@ const createAssignment = asyncHandler(async (req, res) => {
 });
 
 const getAssignments = asyncHandler(async (req, res) => {
-  const { volunteer_id, disaster_id, status } = req.query;
+
+  const {
+    volunteer_id,
+    disaster_id,
+    status
+  } = req.query;
+
   const params = [];
 
   let sql = `
     SELECT
       a.*,
+
       v.full_name AS volunteer_name,
+
       d.title AS disaster_title,
       d.location AS disaster_location,
-      s.name AS shelter_name
+
+      s.name AS shelter_name,
+
+      r.id AS report_id,
+      r.title AS report_title,
+      r.content AS report_content,
+      r.photo_url,
+      r.report_status,
+      r.updated_at AS report_updated_at
+
     FROM assignments a
-    JOIN volunteers v ON a.volunteer_id = v.id
-    JOIN disasters d ON a.disaster_id = d.id
-    LEFT JOIN shelters s ON a.shelter_id = s.id
+
+    JOIN volunteers v
+      ON a.volunteer_id = v.id
+
+    JOIN disasters d
+      ON a.disaster_id = d.id
+
+    LEFT JOIN shelters s
+      ON a.shelter_id = s.id
+
+    LEFT JOIN reports r
+      ON r.assignment_id = a.id
+
     WHERE 1 = 1
   `;
 
   if (volunteer_id) {
+
     sql += ' AND a.volunteer_id = ?';
+
     params.push(volunteer_id);
   }
 
   if (disaster_id) {
+
     sql += ' AND a.disaster_id = ?';
+
     params.push(disaster_id);
   }
 
   if (status) {
+
     sql += ' AND a.assignment_status = ?';
+
     params.push(status);
   }
 
-  sql += ' ORDER BY a.id ASC';
+  sql += `
+    ORDER BY
+      a.id ASC,
+      r.updated_at DESC
+  `;
 
   const rows = await query(sql, params);
 
   res.json({
+
     success: true,
-    message: 'Data penugasan berhasil diambil',
+
+    message:
+      'Data penugasan berhasil diambil',
+
     data: rows
   });
 });

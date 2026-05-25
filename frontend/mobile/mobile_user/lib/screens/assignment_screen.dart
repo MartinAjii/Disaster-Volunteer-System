@@ -68,8 +68,8 @@ class _AssignmentScreenState
 
       itemBuilder: (context, index) {
 
-        final assignment =
-            assignments[index];
+        final assignment = assignments[index];
+        final reportStatus = assignment["report_status"];
 
         return Card(
 
@@ -134,60 +134,93 @@ class _AssignmentScreenState
                     Container(
 
                       padding:
-                          const EdgeInsets
-                              .symmetric(
-
+                          const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 6,
                       ),
 
-                      decoration:
-                          BoxDecoration(
-
+                      decoration: BoxDecoration(
                         color: Colors.orange,
 
                         borderRadius:
-                            BorderRadius
-                                .circular(
-                                    20),
+                            BorderRadius.circular(20),
                       ),
 
                       child: Text(
-
                         assignment[
                                 "assignment_status"] ??
                             "-",
                       ),
                     ),
 
-                    ElevatedButton.icon(
+                    if (
+                      reportStatus == null ||
+                      reportStatus == "rejected"
+                    )
 
-                      onPressed: () {
+                      ElevatedButton.icon(
 
-                        Navigator.push(
+                        onPressed: () async {
 
-                          context,
+                          await Navigator.push(
 
-                          MaterialPageRoute(
+                            context,
 
-                            builder: (_) =>
-                                ReportFormScreen(
-                              assignment:
-                                  assignment,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ReportFormScreen(
+                                assignment: assignment,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
 
-                      icon: const Icon(
-                        Icons.description,
-                        size: 18,
-                      ),
+                          loadAssignments();
+                        },
 
-                      label: const Text(
-                        "Laporan",
+                        icon: const Icon(
+                          Icons.description,
+                        ),
+
+                        label: Text(
+                          reportStatus == "rejected"
+                              ? "Revisi"
+                              : "Laporan",
+                        ),
+                      )
+
+                    else
+
+                      Container(
+
+                        padding:
+                            const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+
+                        decoration: BoxDecoration(
+
+                          color: reportStatus ==
+                                  "verified"
+
+                              ? Colors.green
+
+                              : reportStatus ==
+                                      "rejected"
+
+                                  ? Colors.red
+
+                                  : Colors.blue,
+
+                          borderRadius:
+                              BorderRadius.circular(
+                                  20),
+                        ),
+
+                        child: Text(
+                          reportStatus,
+                        ),
                       ),
-                    ),
                   ],
                 )
               ],

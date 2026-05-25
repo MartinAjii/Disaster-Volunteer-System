@@ -1,22 +1,25 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../core/services/report_service.dart';
 
-class ReportFormScreen
-    extends StatefulWidget {
+class ReportFormScreen extends StatefulWidget {
 
   final dynamic assignment;
 
   const ReportFormScreen({
+
     super.key,
+
     required this.assignment,
   });
 
   @override
-  State<ReportFormScreen>
-      createState() =>
-          _ReportFormScreenState();
+  State<ReportFormScreen> createState() =>
+      _ReportFormScreenState();
 }
 
 class _ReportFormScreenState
@@ -28,9 +31,38 @@ class _ReportFormScreenState
   final contentController =
       TextEditingController();
 
-  File? selectedImage;
+  XFile? selectedImage;
 
   bool isLoading = false;
+
+  late bool isRevision;
+
+  @override
+  void initState() {
+
+    super.initState();
+
+    final reportStatus =
+        widget.assignment[
+            "report_status"];
+
+    isRevision =
+        reportStatus ==
+            "rejected";
+
+    if (isRevision) {
+
+      titleController.text =
+          widget.assignment[
+                  "report_title"] ??
+              "";
+
+      contentController.text =
+          widget.assignment[
+                  "report_content"] ??
+              "";
+    }
+  }
 
   Future<void> pickImage()
   async {
@@ -40,15 +72,16 @@ class _ReportFormScreenState
 
     final picked =
         await picker.pickImage(
-      source: ImageSource.gallery,
+
+      source:
+          ImageSource.gallery,
     );
 
     if (picked != null) {
 
       setState(() {
 
-        selectedImage =
-            File(picked.path);
+        selectedImage = picked;
       });
     }
   }
@@ -59,6 +92,7 @@ class _ReportFormScreenState
     if (titleController.text
             .trim()
             .isEmpty ||
+
         contentController.text
             .trim()
             .isEmpty) {
@@ -79,30 +113,69 @@ class _ReportFormScreenState
     }
 
     setState(() {
+
       isLoading = true;
     });
 
-    final result =
-        await ReportService
-            .createReport(
+    final reportId =
+        widget.assignment[
+            "report_id"];
 
-      assignmentId:
-          widget.assignment["id"],
+    Map<String, dynamic>
+        result;
 
-      disasterId:
-          widget.assignment[
-              "disaster_id"],
+    if (reportId != null) {
 
-      title:
-          titleController.text,
+      result =
+          await ReportService
+              .updateReport(
 
-      content:
-          contentController.text,
+        reportId:
+            reportId,
 
-      photo: selectedImage,
-    );
+        assignmentId:
+            widget.assignment["id"],
+
+        disasterId:
+            widget.assignment[
+                "disaster_id"],
+
+        title:
+            titleController.text,
+
+        content:
+            contentController.text,
+
+        photo:
+            selectedImage,
+      );
+
+    } else {
+
+      result =
+          await ReportService
+              .createReport(
+
+        assignmentId:
+            widget.assignment["id"],
+
+        disasterId:
+            widget.assignment[
+                "disaster_id"],
+
+        title:
+            titleController.text,
+
+        content:
+            contentController.text,
+
+        photo:
+            selectedImage,
+      );
+    }
 
     setState(() {
+
       isLoading = false;
     });
 
@@ -113,15 +186,20 @@ class _ReportFormScreenState
               context)
           .showSnackBar(
 
-        const SnackBar(
+        SnackBar(
 
           content: Text(
-            "Laporan berhasil dikirim",
+
+            isRevision
+
+                ? "Revisi laporan berhasil dikirim"
+
+                : "Laporan berhasil dikirim",
           ),
         ),
       );
 
-      Navigator.pop(context);
+      Navigator.pop(context, true);
 
     } else {
 
@@ -134,6 +212,7 @@ class _ReportFormScreenState
           content: Text(
 
             result["message"] ??
+
                 "Gagal mengirim laporan",
           ),
         ),
@@ -147,8 +226,14 @@ class _ReportFormScreenState
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text(
-          "Buat Laporan",
+
+        title: Text(
+
+          isRevision
+
+              ? "Revisi Laporan"
+
+              : "Buat Laporan",
         ),
       ),
 
@@ -160,7 +245,51 @@ class _ReportFormScreenState
 
         child: Column(
 
+          crossAxisAlignment:
+              CrossAxisAlignment
+                  .start,
+
           children: [
+
+            if (isRevision)
+
+              Container(
+
+                width:
+                    double.infinity,
+
+                padding:
+                    const EdgeInsets
+                        .all(12),
+
+                margin:
+                    const EdgeInsets
+                        .only(
+                            bottom:
+                                20),
+
+                decoration:
+                    BoxDecoration(
+
+                  color: Colors.red
+                      .withOpacity(
+                          0.1),
+
+                  borderRadius:
+                      BorderRadius
+                          .circular(
+                              12),
+                ),
+
+                child: const Text(
+
+                  "Laporan sebelumnya ditolak admin. Silakan revisi laporan lalu kirim kembali.",
+
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+              ),
 
             TextField(
 
@@ -204,11 +333,61 @@ class _ReportFormScreenState
                     BorderRadius
                         .circular(12),
 
-                child: Image.file(
-                  selectedImage!,
+                child: kIsWeb
+
+                    ? Image.network(
+
+                        selectedImage!
+                            .path,
+
+                        height: 200,
+
+                        width:
+                            double
+                                .infinity,
+
+                        fit: BoxFit
+                            .cover,
+                      )
+
+                    : Image.file(
+
+                        File(
+                          selectedImage!
+                              .path,
+                        ),
+
+                        height: 200,
+
+                        width:
+                            double
+                                .infinity,
+
+                        fit: BoxFit
+                            .cover,
+                      ),
+              )
+
+            else if (widget.assignment[
+                    "photo_url"] !=
+                null)
+
+              ClipRRect(
+
+                borderRadius:
+                    BorderRadius
+                        .circular(12),
+
+                child: Image.network(
+
+                  widget.assignment[
+                      "photo_url"],
+
                   height: 200,
+
                   width:
                       double.infinity,
+
                   fit: BoxFit.cover,
                 ),
               ),
@@ -231,8 +410,13 @@ class _ReportFormScreenState
                   Icons.image,
                 ),
 
-                label: const Text(
-                  "Pilih Foto",
+                label: Text(
+
+                  isRevision
+
+                      ? "Ganti Foto"
+
+                      : "Pilih Foto",
                 ),
               ),
             ),
@@ -249,8 +433,11 @@ class _ReportFormScreenState
                   ElevatedButton(
 
                 onPressed:
+
                     isLoading
+
                         ? null
+
                         : submitReport,
 
                 child: isLoading
@@ -267,8 +454,13 @@ class _ReportFormScreenState
                         ),
                       )
 
-                    : const Text(
-                        "Kirim Laporan",
+                    : Text(
+
+                        isRevision
+
+                            ? "Kirim Revisi"
+
+                            : "Kirim Laporan",
                       ),
               ),
             ),
