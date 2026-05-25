@@ -92,7 +92,7 @@ const DisasterTable = ({
                           label="Disaster"
                         />
 
-                        <button className="btn btn-light btn-sm" onClick={() => onEdit(d)}>
+                        <button className="btn btn-primary btn-sm" onClick={() => onEdit(d)}>
                           Edit
                         </button>
 
