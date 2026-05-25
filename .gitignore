@@ -7,6 +7,7 @@ build
 backend/node_modules/
 backend/.env
 backend/service-account.json
+backend/firebase-service-account.json
 
 # Frontend
 frontend/node_modules/
