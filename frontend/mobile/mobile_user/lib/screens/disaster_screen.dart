@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../core/services/disaster_service.dart';
+import 'disaster_detail_screen.dart';
 
-class DisasterScreen
-    extends StatefulWidget {
+class DisasterScreen extends StatefulWidget {
 
   const DisasterScreen({
     super.key,
@@ -41,29 +40,6 @@ class _DisasterScreenState
 
       isLoading = false;
     });
-  }
-
-  Future<void> openRoute(
-    double latitude,
-    double longitude,
-  ) async {
-
-    final url =
-        "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
-
-    final uri =
-        Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-
-      await launchUrl(
-
-        uri,
-
-        mode:
-            LaunchMode.externalApplication,
-      );
-    }
   }
 
   Color getSeverityColor(
@@ -130,48 +106,28 @@ class _DisasterScreenState
               disaster["severity"] ??
                   "medium";
 
-          final latitude =
-              double.tryParse(
-
-            disaster["latitude"]
-                    ?.toString() ??
-                "",
-          );
-
-          final longitude =
-              double.tryParse(
-
-            disaster["longitude"]
-                    ?.toString() ??
-                "",
-          );
-
           return Card(
 
             color: Colors.white10,
 
             margin:
-                const EdgeInsets
-                    .symmetric(
-
+                const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 8,
             ),
 
             shape:
                 RoundedRectangleBorder(
-
               borderRadius:
-                  BorderRadius
-                      .circular(
-                          16),
+                  BorderRadius.circular(
+                      18),
             ),
 
             child: Padding(
 
               padding:
-                  const EdgeInsets
-                      .all(16),
+                  const EdgeInsets.all(
+                      18),
 
               child: Column(
 
@@ -189,11 +145,10 @@ class _DisasterScreenState
                     style:
                         const TextStyle(
 
-                      fontSize: 20,
+                      fontSize: 22,
 
                       fontWeight:
-                          FontWeight
-                              .bold,
+                          FontWeight.bold,
                     ),
                   ),
 
@@ -209,13 +164,8 @@ class _DisasterScreenState
                     children: [
 
                       const Icon(
-
-                        Icons
-                            .location_on,
-
-                        color:
-                            Colors.grey,
-
+                        Icons.location_on,
+                        color: Colors.grey,
                         size: 18,
                       ),
 
@@ -229,6 +179,12 @@ class _DisasterScreenState
                           disaster["location"] ??
                               "-",
 
+                          maxLines: 2,
+
+                          overflow:
+                              TextOverflow
+                                  .ellipsis,
+
                           style:
                               const TextStyle(
                             fontSize: 15,
@@ -239,27 +195,13 @@ class _DisasterScreenState
                   ),
 
                   const SizedBox(
-                      height: 14),
-
-                  Text(
-
-                    disaster["description"] ??
-                        "-",
-
-                    style:
-                        const TextStyle(
-
-                      color:
-                          Colors.grey,
-
-                      fontSize: 14,
-                    ),
-                  ),
-
-                  const SizedBox(
                       height: 18),
 
                   Row(
+
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .spaceBetween,
 
                     children: [
 
@@ -295,29 +237,22 @@ class _DisasterScreenState
                               const TextStyle(
 
                             color:
-                                Colors
-                                    .white,
+                                Colors.white,
 
                             fontWeight:
-                                FontWeight
-                                    .bold,
+                                FontWeight.bold,
                           ),
                         ),
                       ),
 
-                      const SizedBox(
-                          width: 12),
-
-                      ElevatedButton
-                          .icon(
+                      ElevatedButton(
 
                         style:
                             ElevatedButton
                                 .styleFrom(
 
                           backgroundColor:
-                              Colors
-                                  .blue,
+                              Colors.blue,
 
                           shape:
                               RoundedRectangleBorder(
@@ -329,43 +264,33 @@ class _DisasterScreenState
                           ),
                         ),
 
-                        onPressed:
+                        onPressed: () {
 
-                            latitude != null &&
-                                    longitude !=
-                                        null
+                          Navigator.push(
 
-                                ? () {
+                            context,
 
-                                    openRoute(
-                                      latitude,
-                                      longitude,
-                                    );
-                                  }
+                            MaterialPageRoute(
 
-                                : null,
+                              builder:
+                                  (_) =>
+                                      DisasterDetailScreen(
+                                disaster:
+                                    disaster,
+                              ),
+                            ),
+                          );
+                        },
 
-                        icon:
-                            const Icon(
-
-                          Icons.route,
-
-                          color:
-                              Colors.white,
-
-                          size: 18,
-                        ),
-
-                        label:
+                        child:
                             const Text(
 
-                          "Route",
+                          "Detail",
 
                           style:
                               TextStyle(
                             color:
-                                Colors
-                                    .white,
+                                Colors.white,
                           ),
                         ),
                       ),

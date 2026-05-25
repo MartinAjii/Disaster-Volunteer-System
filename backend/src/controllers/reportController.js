@@ -5,13 +5,27 @@ const asyncHandler = require('../utils/asyncHandler');
 const createReport = asyncHandler(async (req, res) => {
   const {
     assignment_id = null,
-    volunteer_id,
     disaster_id,
     title,
     content,
     photo_url = null,
     report_status = 'submitted'
   } = req.body;
+
+  const volunteerRows = await query(
+    'SELECT id FROM volunteers WHERE user_id = ?',
+    [req.user.id]
+  );
+
+  if (volunteerRows.length === 0) {
+
+    return res.status(404).json({
+      success: false,
+      message: 'Volunteer tidak ditemukan'
+    });
+  }
+
+  const volunteer_id = volunteerRows[0].id;
 
   if (!volunteer_id || !disaster_id || !title || !content) {
     return res.status(400).json({
@@ -179,10 +193,4 @@ const deleteReport = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = {
-  createReport,
-  getReports,
-  getReportById,
-  updateReport,
-  deleteReport
-};
+module.exports = {createReport, getReports,getReportById, updateReport, deleteReport};
