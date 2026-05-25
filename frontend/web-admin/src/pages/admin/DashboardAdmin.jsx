@@ -120,6 +120,22 @@ const MapViewModal = ({
   realtimeLocations = []
 }) => {
   
+  useEffect(() => {
+    console.log("=== MapViewModal Debug ===");
+    console.log("Type:", type);
+    console.log("Data ID:", data?.id);
+    console.log("Data:", data);
+    console.log("Realtime Locations:", realtimeLocations);
+    
+    if (type === "volunteer") {
+      const found = realtimeLocations?.find(
+        (r) => String(r?.volunteer_id) === String(data?.id)
+      );
+      console.log("Looking for volunteer_id:", data?.id);
+      console.log("Found realtime data:", found);
+    }
+  }, [type, data, realtimeLocations]);
+  
   const realtime =
   realtimeLocations?.find(
     (r) =>
@@ -604,12 +620,31 @@ const DashboardAdmin = () => {
           id: doc.id,
           ...doc.data()
         }));
-        console.log("Realtime Firebase:", data);
+        console.log("=== REALTIME FIREBASE ===");
+        console.log("Total realtime locations:", data.length);
+        console.log("Realtime data:", data);
+        data.forEach(r => {
+          console.log(`Volunteer ID: ${r.volunteer_id}, Lat: ${r.latitude}, Lng: ${r.longitude}, Status: ${r.status}`);
+        });
         setRealtimeLocations(data);
+      },
+      (error) => {
+        console.error("Firebase realtime error:", error);
       }
     );
     return () => unsubscribe();
   }, []);
+
+  /* ── Debug: Log volunteers setiap kali berubah ── */
+  useEffect(() => {
+    if (volunteers.length > 0) {
+      console.log("=== VOLUNTEERS LIST ===");
+      console.log("Total volunteers:", volunteers.length);
+      volunteers.forEach(v => {
+        console.log(`ID: ${v.id}, Name: ${v.full_name}, Lat: ${v.latitude}, Lng: ${v.longitude}, Status: ${v.availability_status}`);
+      });
+    }
+  }, [volunteers]);
 
   const menus = [
     { key: "dashboard",   icon: "fas fa-chart-line", label: "Dashboard" },
