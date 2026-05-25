@@ -1,18 +1,8 @@
-const Sidebar = ({ activeSection, setActiveSection, onLogout }) => {
-  const menus = [
-    { key: 'dashboard',   icon: 'fas fa-chart-line', label: 'Dashboard' },
-    { key: 'volunteers',  icon: 'fas fa-users',       label: 'Volunteers' },
-    { key: 'disasters',   icon: 'fas fa-fire',        label: 'Disasters' },
-    { key: 'shelters',    icon: 'fas fa-home',        label: 'Shelters' },
-    { key: 'assignments', icon: 'fas fa-tasks',       label: 'Assignments' },
-  ];
-
+const Sidebar = ({ menus, activeSection, setActiveSection, handleLogout }) => {
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <i className="fas fa-hands-helping"></i>
-        </div>
+        <div className="sidebar-logo-icon"><i className="fas fa-hands-helping"></i></div>
         <div>
           <div className="sidebar-logo-text">DVN Admin</div>
           <div className="sidebar-logo-sub">Disaster Volunteer Network</div>
@@ -21,25 +11,18 @@ const Sidebar = ({ activeSection, setActiveSection, onLogout }) => {
 
       <nav className="sidebar-nav">
         <div className="sidebar-section-label">Menu Utama</div>
-        {menus.map((menu) => (
+        {menus.map((m) => (
           <button
-            key={menu.key}
-            className={`nav-link ${activeSection === menu.key ? 'active' : ''}`}
-            onClick={() => setActiveSection(menu.key)}
+            key={m.key}
+            className={`nav-link ${activeSection === m.key ? "active" : ""}`}
+            onClick={() => setActiveSection(m.key)}
           >
-            <i className={menu.icon}></i>
-            {menu.label}
+            <i className={m.icon}></i>{m.label}
           </button>
         ))}
-
         <div className="sidebar-divider" />
-
-        <button
-          className="nav-link logout-link"
-          onClick={onLogout}
-        >
-          <i className="fas fa-sign-out-alt"></i>
-          Logout
+        <button className="nav-link logout-link" onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt"></i>Logout
         </button>
       </nav>
     </div>
