@@ -18,8 +18,8 @@ function LandingPage() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const token = sessionStorage.getItem("token");
+    const storedUser = sessionStorage.getItem("user");
 
     let user = null;
 
@@ -28,8 +28,8 @@ function LandingPage() {
         user = JSON.parse(storedUser);
       }
     } catch {
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+      sessionStorage.removeItem("token");
       user = null;
     }
 
@@ -52,8 +52,8 @@ function LandingPage() {
       });
       const data = await res.json();
       if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.data));
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("user", JSON.stringify(data.data));
 
         navigate(data.data.role === "admin" ? "/admin/dashboard" : "/user/dashboard", {
           replace: true,
