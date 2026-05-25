@@ -9,6 +9,7 @@ const createShelter = asyncHandler(async (req, res) => {
     longitude = null,
     capacity = 0,
     current_capacity = 0,
+    status = 'tersedia',      // ✅ tambahkan, default sesuai schema
     coordinator = null,
     contact = null
   } = req.body;
@@ -17,6 +18,15 @@ const createShelter = asyncHandler(async (req, res) => {
     return res.status(400).json({
       success: false,
       message: 'Nama posko dan lokasi wajib diisi'
+    });
+  }
+
+  // ✅ validasi nilai status
+  const allowedStatus = ['tersedia', 'penuh'];
+  if (!allowedStatus.includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Status harus bernilai "tersedia" atau "penuh"'
     });
   }
 
@@ -38,7 +48,7 @@ const createShelter = asyncHandler(async (req, res) => {
       longitude,
       capacity,
       current_capacity,
-      status,
+      status,          // ✅ sekarang sudah terdefinisi
       coordinator,
       contact
     }
@@ -85,15 +95,28 @@ const updateShelter = asyncHandler(async (req, res) => {
     longitude = null,
     capacity = 0,
     current_capacity = 0,
+    status,             // ✅ tambahkan di update juga
     coordinator = null,
     contact = null
   } = req.body;
 
+  // ✅ validasi status jika dikirim
+  if (status !== undefined) {
+    const allowedStatus = ['tersedia', 'penuh'];
+    if (!allowedStatus.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status harus bernilai "tersedia" atau "penuh"'
+      });
+    }
+  }
+
   const result = await query(
     `UPDATE shelters
-     SET name = ?, location = ?, latitude = ?, longitude = ?, capacity = ?, current_capacity = ?, coordinator = ?, contact = ?
+     SET name = ?, location = ?, latitude = ?, longitude = ?, capacity = ?,
+         current_capacity = ?, status = ?, coordinator = ?, contact = ?
      WHERE id = ?`,
-    [name, location, latitude, longitude, capacity, current_capacity, coordinator, contact, req.params.id]
+    [name, location, latitude, longitude, capacity, current_capacity, status, coordinator, contact, req.params.id]
   );
 
   if (result.affectedRows === 0) {
