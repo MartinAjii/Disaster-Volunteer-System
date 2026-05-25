@@ -43,7 +43,6 @@ const DashboardAdmin = () => {
 
   const getUser = () => {
     const storedUser = localStorage.getItem("user");
-
     try {
       if (storedUser && storedUser !== "undefined") {
         return JSON.parse(storedUser);
@@ -51,7 +50,6 @@ const DashboardAdmin = () => {
     } catch {
       localStorage.removeItem("user");
     }
-
     return {};
   };
 
@@ -128,7 +126,6 @@ const DashboardAdmin = () => {
         console.error("Firebase realtime error:", error);
       }
     );
-
     return () => unsubscribe();
   }, []);
 
@@ -138,14 +135,30 @@ const DashboardAdmin = () => {
       headers: authHeaders(),
       body: JSON.stringify(body),
     });
-
     const json = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      throw new Error(json.message || "Gagal menyimpan data");
-    }
-
+    if (!res.ok) throw new Error(json.message || "Gagal menyimpan data");
     return json;
+  };
+
+  // ── DELETE handler ──
+  const deleteData = async (url) => {
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.message || "Gagal menghapus data");
+    return json;
+  };
+
+  const handleDeleteVolunteer = async (v) => {
+    if (!window.confirm(`Hapus volunteer "${v.full_name || v.name}"?`)) return;
+    try {
+      await deleteData(`${VOLUNTEERS_URL}/${v.id}`);
+      fetchData();
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   const openModal = (section) => {
@@ -309,6 +322,7 @@ const DashboardAdmin = () => {
             error={error}
             onAdd={() => openModal("volunteers")}
             onMap={(v) => setMapView({ data: v, type: "volunteer" })}
+            onDelete={handleDeleteVolunteer}
           />
         )}
 

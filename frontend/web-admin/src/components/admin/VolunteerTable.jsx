@@ -2,7 +2,7 @@ import StateDisplay from "./StateDisplay";
 import MapButton from "./MapButton";
 import { statusBadge } from "./badges";
 
-const VolunteerTable = ({ volunteers, loading, error, onAdd, onMap }) => {
+const VolunteerTable = ({ volunteers, loading, error, onAdd, onMap, onDelete }) => {
   const state = <StateDisplay loading={loading} error={error} data={volunteers} />;
 
   return (
@@ -29,8 +29,20 @@ const VolunteerTable = ({ volunteers, loading, error, onAdd, onMap }) => {
                     <td>{v.phone || "-"}</td>
                     <td>{v.skills || "-"}</td>
                     <td>{statusBadge(v.availability_status || v.status)}</td>
-                    <td>
+                    <td style={{ display: "flex", gap: 6 }}>
                       <MapButton onClick={() => onMap(v)} color="#3b82f6" label="Volunteer" />
+                      <button
+                        onClick={() => onDelete(v)}
+                        title="Hapus Volunteer"
+                        style={{
+                          padding: "4px 10px", borderRadius: 6, border: "none",
+                          background: "#ef4444", color: "#fff", fontSize: 11, fontWeight: 600,
+                          cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <i className="fas fa-trash"></i> Hapus
+                      </button>
                     </td>
                   </tr>
                 ))}
