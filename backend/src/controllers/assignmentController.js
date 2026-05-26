@@ -107,6 +107,25 @@ const getAssignments = asyncHandler(async (req, res) => {
     WHERE 1 = 1
   `;
 
+  // Jika volunteer (bukan admin), hanya tampilkan assignment milik mereka
+  if (req.user.role === 'volunteer') {
+    const volunteerData = await query(
+      'SELECT id FROM volunteers WHERE user_id = ?',
+      [req.user.id]
+    );
+
+    if (volunteerData.length > 0) {
+      sql += ' AND a.volunteer_id = ?';
+      params.push(volunteerData[0].id);
+    } else {
+      return res.json({
+        success: true,
+        message: 'Data penugasan berhasil diambil',
+        data: []
+      });
+    }
+  }
+
   if (volunteer_id) {
 
     sql += ' AND a.volunteer_id = ?';
