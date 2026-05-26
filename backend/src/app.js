@@ -53,5 +53,11 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Backend running on port ${PORT}`);
-  await testConnection();
+  try {
+    await testConnection();
+    console.log('DB connection successful');
+  } catch (err) {
+    // Log but don't crash — Cloud Run needs the port open
+    console.error('DB connection failed on startup:', err.message);
+  }
 });

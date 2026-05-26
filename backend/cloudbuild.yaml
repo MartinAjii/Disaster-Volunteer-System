@@ -25,6 +25,7 @@ steps:
         "gcr.io/$PROJECT_ID/disaster-volunteer-backend",
         "--platform",
         "managed",
+        "--timeout", "300",
         "--region",
         "asia-southeast2",
         "--allow-unauthenticated",

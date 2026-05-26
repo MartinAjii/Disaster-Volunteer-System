@@ -7,6 +7,11 @@ let bucket = null;
 
 function getBucket() {
   const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET;
+    if (!bucketName) {
+      console.warn('WARNING: GOOGLE_CLOUD_STORAGE_BUCKET is not set');
+    }
+
+  const bucket = storage.bucket(bucketName || 'placeholder-bucket');
   
   if (!bucketName) {
     return null;
