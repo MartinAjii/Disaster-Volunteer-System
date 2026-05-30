@@ -1,6 +1,4 @@
-export const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://disaster-volunteer-backend-118865344431.asia-southeast2.run.app/api";
+export const API_URL ="https://disaster-volunteer-backend-118865344431.asia-southeast2.run.app/api";
 
 export const AUTH_URL = `${API_URL}/auth`;
 export const VOLUNTEERS_URL = `${API_URL}/volunteers`;
