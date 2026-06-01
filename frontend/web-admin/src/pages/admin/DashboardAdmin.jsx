@@ -616,15 +616,32 @@ const DashboardAdmin = () => {
           },
         ],
         onSubmit: async (form) => {
+          const emptyToNull = (value) => {
+            if (value === "" || value === undefined || value === null) {
+              return null;
+            }
+
+            return value;
+          };
+
+          const numberOrZero = (value) => {
+            if (value === "" || value === undefined || value === null) {
+              return 0;
+            }
+
+            return Number(value);
+          };
+
           const payload = {
-            ...form,
+            name: form.name,
+            location: form.location,
             latitude: emptyToNull(form.latitude),
             longitude: emptyToNull(form.longitude),
             capacity: numberOrZero(form.capacity),
             current_capacity: numberOrZero(form.current_capacity),
+            status: form.status || "tersedia",
             coordinator: emptyToNull(form.coordinator),
             contact: emptyToNull(form.contact),
-            status: form.status || "tersedia",
           };
 
           await postData(SHELTERS_URL, payload);
