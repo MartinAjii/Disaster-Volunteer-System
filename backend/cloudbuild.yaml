@@ -5,7 +5,9 @@ steps:
         "build",
         "-t",
         "gcr.io/$PROJECT_ID/disaster-volunteer-backend",
-        "."
+        "-f",
+        "backend/Dockerfile",
+        "backend"
       ]
 
   - name: "gcr.io/cloud-builders/docker"

@@ -1,36 +1,17 @@
-const admin =
-  require('firebase-admin');
+const admin = require('firebase-admin');
 
-const serviceAccount =
-  require('../../firebase-service-account.json');
-
-admin.initializeApp({
-
-  credential:
-    admin.credential.cert(
-      serviceAccount
-    )
-});
-
-const firestore =
-  admin.firestore();
-
-console.log(
-  'Firestore connected'
+const serviceAccount = JSON.parse(
+  process.env.FIREBASE_SERVICE_ACCOUNT
 );
 
-function getFirestore() {
-  return firestore;
-}
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
-function serverTimestamp() {
-
-  return admin.firestore
-    .FieldValue
-    .serverTimestamp();
-}
+const firestore = admin.firestore();
 
 module.exports = {
-  getFirestore,
-  serverTimestamp
+  getFirestore: () => firestore,
+  serverTimestamp: () =>
+    admin.firestore.FieldValue.serverTimestamp()
 };
