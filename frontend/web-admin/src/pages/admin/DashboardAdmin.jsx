@@ -398,6 +398,22 @@ const DashboardAdmin = () => {
     }
   };
 
+  const emptyToNull = (value) => {
+  if (value === "" || value === undefined || value === null) {
+    return null;
+  }
+
+    return value;
+  };
+
+  const numberOrZero = (value) => {
+    if (value === "" || value === undefined || value === null) {
+      return 0;
+    }
+
+    return Number(value);
+  };
+
   // ─────────────────────────────
   // OPEN MODAL (ADD)
   // ─────────────────────────────
@@ -466,10 +482,27 @@ const DashboardAdmin = () => {
           {
             key: "title",
             label: "Judul Bencana",
+            placeholder: "cth: Banjir Bantul",
+          },
+          {
+            key: "type",
+            label: "Jenis Bencana",
+            type: "select",
+            default: "Banjir",
+            options: [
+              "Banjir",
+              "Gempa",
+              "Longsor",
+              "Kebakaran",
+              "Tsunami",
+              "Angin Puting Beliung",
+              "Lainnya",
+            ],
           },
           {
             key: "location",
             label: "Lokasi",
+            placeholder: "cth: Bantul, Yogyakarta",
           },
           {
             key: "latitude",
@@ -483,9 +516,44 @@ const DashboardAdmin = () => {
             type: "number",
             required: false,
           },
+          {
+            key: "severity",
+            label: "Tingkat Keparahan",
+            type: "select",
+            default: "medium",
+            options: ["low", "medium", "high", "critical"],
+          },
+          {
+            key: "disaster_date",
+            label: "Tanggal Kejadian",
+            type: "date",
+            default: new Date().toISOString().slice(0, 10),
+          },
+          {
+            key: "description",
+            label: "Deskripsi",
+            type: "textarea",
+            required: false,
+          },
+          {
+            key: "status",
+            label: "Status",
+            type: "select",
+            default: "active",
+            options: ["active", "handled", "closed"],
+          },
         ],
         onSubmit: async (form) => {
-          await postData(DISASTERS_URL, form);
+          const payload = {
+            ...form,
+            latitude: emptyToNull(form.latitude),
+            longitude: emptyToNull(form.longitude),
+            description: emptyToNull(form.description),
+            severity: form.severity || "medium",
+            status: form.status || "active",
+          };
+
+          await postData(DISASTERS_URL, payload);
           setModal(null);
           fetchData();
         },
@@ -498,10 +566,12 @@ const DashboardAdmin = () => {
           {
             key: "name",
             label: "Nama Shelter",
+            placeholder: "cth: Posko Utama Bantul",
           },
           {
             key: "location",
             label: "Lokasi / Alamat",
+            placeholder: "cth: Bantul, Yogyakarta",
           },
           {
             key: "latitude",
@@ -522,9 +592,16 @@ const DashboardAdmin = () => {
             default: "0",
           },
           {
+            key: "current_capacity",
+            label: "Jumlah Terisi",
+            type: "number",
+            default: "0",
+          },
+          {
             key: "status",
             label: "Status",
             type: "select",
+            default: "tersedia",
             options: ["tersedia", "penuh"],
           },
           {
@@ -539,7 +616,18 @@ const DashboardAdmin = () => {
           },
         ],
         onSubmit: async (form) => {
-          await postData(SHELTERS_URL, form);
+          const payload = {
+            ...form,
+            latitude: emptyToNull(form.latitude),
+            longitude: emptyToNull(form.longitude),
+            capacity: numberOrZero(form.capacity),
+            current_capacity: numberOrZero(form.current_capacity),
+            coordinator: emptyToNull(form.coordinator),
+            contact: emptyToNull(form.contact),
+            status: form.status || "tersedia",
+          };
+
+          await postData(SHELTERS_URL, payload);
           setModal(null);
           fetchData();
         },
@@ -678,7 +766,18 @@ const DashboardAdmin = () => {
               })
             }
             onEdit={openEditDisaster}
-            onDelete={(id) => deleteData(`${DISASTERS_URL}/${id}`)}
+            onDelete={async (id) => {
+              const confirmDelete = window.confirm("Yakin ingin menghapus disaster ini?");
+
+              if (!confirmDelete) return;
+
+              try {
+                await deleteData(`${DISASTERS_URL}/${id}`);
+                fetchData();
+              } catch (err) {
+                alert(err.message);
+              }
+            }}
           />
         )}
 
