@@ -85,6 +85,7 @@ class AuthService {
           "address": address,
 
           "skills": skills,
+
         }),
       );
 
@@ -154,6 +155,8 @@ class AuthService {
     required String address,
 
     required String skills,
+
+    String? password,
   }) async {
 
     try {
@@ -190,6 +193,8 @@ class AuthService {
           "address": address,
 
           "skills": skills,
+
+          "password": password,
         }),
       );
 
