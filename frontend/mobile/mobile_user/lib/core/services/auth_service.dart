@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constants/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'location_background_service.dart';
 
 class AuthService {
 
@@ -136,11 +137,11 @@ class AuthService {
   static Future<void> logout()
   async {
 
-    final prefs =
-        await SharedPreferences.getInstance();
+    await stopLocationService();
 
-    print("TOKEN DIAMBIL:");
-    print(prefs.getString("token"));
+    final prefs =
+        await SharedPreferences
+            .getInstance();
 
     await prefs.clear();
   }

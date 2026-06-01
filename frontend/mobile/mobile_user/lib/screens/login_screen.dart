@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './dashboard_screen.dart';
 import '../../core/services/auth_service.dart';
 import 'register_screen.dart';
+import '../core/services/location_background_service.dart';
 
 class LoginScreen
     extends StatefulWidget {
@@ -82,6 +83,8 @@ class _LoginScreenState
         token,
         user,
       );
+
+      await startLocationService();
 
       ScaffoldMessenger.of(
               context)

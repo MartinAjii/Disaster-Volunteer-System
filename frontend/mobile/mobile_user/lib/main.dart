@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'core/services/auth_service.dart';
 import 'screens/dashboard_screen.dart';
+import 'core/services/location_background_service.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+
+  WidgetsFlutterBinding
+      .ensureInitialized();
+
+  await initializeBackgroundService();
+
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatefulWidget {
