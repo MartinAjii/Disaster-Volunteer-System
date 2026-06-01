@@ -1,5 +1,26 @@
-const { pool, query } = require('../config/db');
+const { query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
+
+const emptyToNull = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  return value;
+};
+
+const numberOrZero = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return 0;
+  }
+
+  return Number(value);
+};
+
+const normalizeStatus = (status) => {
+  if (status === 'penuh') return 'penuh';
+  return 'tersedia';
+};
 
 const createShelter = asyncHandler(async (req, res) => {
   const {
@@ -9,7 +30,7 @@ const createShelter = asyncHandler(async (req, res) => {
     longitude = null,
     capacity = 0,
     current_capacity = 0,
-    status = 'tersedia',      // ✅ tambahkan, default sesuai schema
+    status = 'tersedia',
     coordinator = null,
     contact = null
   } = req.body;
@@ -21,20 +42,23 @@ const createShelter = asyncHandler(async (req, res) => {
     });
   }
 
-  // ✅ validasi nilai status
-  const allowedStatus = ['tersedia', 'penuh'];
-  if (!allowedStatus.includes(status)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Status harus bernilai "tersedia" atau "penuh"'
-    });
-  }
+  const cleanStatus = normalizeStatus(status);
 
   const result = await query(
     `INSERT INTO shelters
      (name, location, latitude, longitude, capacity, current_capacity, status, coordinator, contact)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [name, location, latitude, longitude, capacity, current_capacity, status, coordinator, contact]
+    [
+      name,
+      location,
+      emptyToNull(latitude),
+      emptyToNull(longitude),
+      numberOrZero(capacity),
+      numberOrZero(current_capacity),
+      cleanStatus,
+      emptyToNull(coordinator),
+      emptyToNull(contact)
+    ]
   );
 
   res.status(201).json({
@@ -44,13 +68,13 @@ const createShelter = asyncHandler(async (req, res) => {
       id: result.insertId,
       name,
       location,
-      latitude,
-      longitude,
-      capacity,
-      current_capacity,
-      status,          // ✅ sekarang sudah terdefinisi
-      coordinator,
-      contact
+      latitude: emptyToNull(latitude),
+      longitude: emptyToNull(longitude),
+      capacity: numberOrZero(capacity),
+      current_capacity: numberOrZero(current_capacity),
+      status: cleanStatus,
+      coordinator: emptyToNull(coordinator),
+      contact: emptyToNull(contact)
     }
   });
 });
@@ -95,28 +119,37 @@ const updateShelter = asyncHandler(async (req, res) => {
     longitude = null,
     capacity = 0,
     current_capacity = 0,
-    status,             // ✅ tambahkan di update juga
+    status = 'tersedia',
     coordinator = null,
     contact = null
   } = req.body;
 
-  // ✅ validasi status jika dikirim
-  if (status !== undefined) {
-    const allowedStatus = ['tersedia', 'penuh'];
-    if (!allowedStatus.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Status harus bernilai "tersedia" atau "penuh"'
-      });
-    }
+  if (!name || !location) {
+    return res.status(400).json({
+      success: false,
+      message: 'Nama posko dan lokasi wajib diisi'
+    });
   }
+
+  const cleanStatus = normalizeStatus(status);
 
   const result = await query(
     `UPDATE shelters
      SET name = ?, location = ?, latitude = ?, longitude = ?, capacity = ?,
          current_capacity = ?, status = ?, coordinator = ?, contact = ?
      WHERE id = ?`,
-    [name, location, latitude, longitude, capacity, current_capacity, status, coordinator, contact, req.params.id]
+    [
+      name,
+      location,
+      emptyToNull(latitude),
+      emptyToNull(longitude),
+      numberOrZero(capacity),
+      numberOrZero(current_capacity),
+      cleanStatus,
+      emptyToNull(coordinator),
+      emptyToNull(contact),
+      req.params.id
+    ]
   );
 
   if (result.affectedRows === 0) {
