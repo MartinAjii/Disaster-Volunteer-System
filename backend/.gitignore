@@ -5,3 +5,12 @@ npm-debug.log
 coverage/
 .DS_Store
 firebase-service-account.json
+
+frontend/mobile/mobile_user/.dart_tool/
+frontend/mobile/mobile_user/android/.gradle/
+frontend/mobile/mobile_user/android/.kotlin/
+frontend/mobile/mobile_user/android/app/.gradle/
+
+**/.dart_tool/
+**/.gradle/
+**/.kotlin/
