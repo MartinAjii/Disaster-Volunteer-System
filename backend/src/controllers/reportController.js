@@ -60,18 +60,15 @@ const createReport =
 
     if (req.file) {
 
-      const base64 =
-        req.file.buffer.toString('base64');
-
-      const mimeType =
-        req.file.mimetype ||
-        'image/jpeg';
-
       finalPhotoUrl =
-        `data:${mimeType};base64,${base64}`;
+        await uploadBuffer(
+          req.file,
+          'reports'
+        );
 
       console.log(
-        '=== PHOTO DEBUG ==='
+        'Uploaded URL:',
+        finalPhotoUrl
       );
 
       console.log(
@@ -318,20 +315,15 @@ const updateReport =
 
     if (req.file) {
 
-      const base64 =
-        req.file.buffer.toString('base64');
-
-      const mimeType =
-        req.file.mimetype ||
-        'image/jpeg';
-
       finalPhotoUrl =
-        `data:${mimeType};base64,${base64}`;
+        await uploadBuffer(
+          req.file,
+          'reports'
+        );
 
       console.log(
-        'Photo stored as base64, size:',
-        finalPhotoUrl.length,
-        'bytes'
+        'Uploaded URL:',
+        finalPhotoUrl
       );
     }
 
