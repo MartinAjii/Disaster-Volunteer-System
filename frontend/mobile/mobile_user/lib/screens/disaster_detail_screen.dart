@@ -18,22 +18,14 @@ class DisasterDetailScreen
     double longitude,
   ) async {
 
-    final url =
-        "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
+    final uri = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude',
+    );
 
-    final uri =
-        Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-
-      await launchUrl(
-
-        uri,
-
-        mode:
-            LaunchMode.externalApplication,
-      );
-    }
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   Color getSeverityColor(
@@ -147,7 +139,7 @@ class DisasterDetailScreen
                             'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 
                         userAgentPackageName:
-                            'com.example.app',
+                            'com.disaster.volunteer.app',
                       ),
 
                       MarkerLayer(

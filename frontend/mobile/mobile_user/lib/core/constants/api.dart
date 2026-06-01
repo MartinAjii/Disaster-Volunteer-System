@@ -5,7 +5,7 @@ class Api {
       "http://127.0.0.1:3000/api";
 
   // ANDROID EMULATOR
-  // static const String baseUrl =
-  //    "http://10.0.2.2:3000/api";
+  static const String cloudUrl =
+      "https://disaster-volunteer-backend-118865344431.asia-southeast2.run.app/api";
 
 }

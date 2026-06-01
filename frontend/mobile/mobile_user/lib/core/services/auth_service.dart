@@ -15,7 +15,7 @@ class AuthService {
 
       final response = await http.post(
         Uri.parse(
-          "${Api.baseUrl}/auth/login",
+          "${Api.cloudUrl}/auth/login",
         ),
 
         headers: {
@@ -64,7 +64,7 @@ class AuthService {
       final response = await http.post(
 
         Uri.parse(
-          "${Api.baseUrl}/auth/register",
+          "${Api.cloudUrl}/auth/register",
         ),
 
         headers: {
@@ -85,6 +85,7 @@ class AuthService {
           "address": address,
 
           "skills": skills,
+
         }),
       );
 
@@ -154,6 +155,8 @@ class AuthService {
     required String address,
 
     required String skills,
+
+    String? password,
   }) async {
 
     try {
@@ -169,7 +172,7 @@ class AuthService {
           await http.put(
 
         Uri.parse(
-          "${Api.baseUrl}/auth/profile",
+          "${Api.cloudUrl}/auth/profile",
         ),
 
         headers: {
@@ -190,6 +193,8 @@ class AuthService {
           "address": address,
 
           "skills": skills,
+
+          "password": password,
         }),
       );
 
@@ -223,7 +228,7 @@ class AuthService {
           await http.get(
 
         Uri.parse(
-          "${Api.baseUrl}/auth/profile",
+          "${Api.cloudUrl}/auth/profile",
         ),
 
         headers: {

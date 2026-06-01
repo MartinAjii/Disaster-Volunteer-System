@@ -31,6 +31,12 @@ class _EditProfileScreenState
   final skillsController =
       TextEditingController();
 
+  final passwordController =
+    TextEditingController();
+
+  final confirmPasswordController =
+      TextEditingController();
+
   bool isLoading = true;
 
   @override
@@ -38,6 +44,19 @@ class _EditProfileScreenState
     super.initState();
 
     loadUser();
+  }
+
+  @override
+  void dispose() {
+
+    nameController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    skillsController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+
+    super.dispose();
   }
 
   void loadUser() async {
@@ -83,6 +102,23 @@ class _EditProfileScreenState
   void updateProfile()
   async {
 
+     if (passwordController.text.isNotEmpty &&
+        passwordController.text !=
+            confirmPasswordController.text) {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+          content: Text(
+            "Konfirmasi password tidak sama",
+          ),
+        ),
+      );
+
+      return;
+    }
+
     final result =
         await AuthService
             .updateProfile(
@@ -98,6 +134,9 @@ class _EditProfileScreenState
 
       skills:
           skillsController.text,
+
+      password: 
+          passwordController.text,
     );
 
     if (result["success"] == true) {
@@ -219,6 +258,43 @@ class _EditProfileScreenState
                   const InputDecoration(
                 labelText:
                     "Keahlian",
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            TextField(
+
+              controller:
+                  passwordController,
+
+              obscureText: true,
+
+              decoration:
+                  const InputDecoration(
+
+                labelText:
+                    "Password Baru",
+
+                hintText:
+                    "Kosongkan jika tidak ingin mengubah password",
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            TextField(
+
+              controller:
+                  confirmPasswordController,
+
+              obscureText: true,
+
+              decoration:
+                  const InputDecoration(
+
+                labelText:
+                    "Konfirmasi Password Baru",
               ),
             ),
 

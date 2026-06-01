@@ -37,7 +37,7 @@ class ReportService {
         "POST",
 
         Uri.parse(
-          "${Api.baseUrl}/reports",
+          "${Api.cloudUrl}/reports",
         ),
       );
 
@@ -149,7 +149,7 @@ class ReportService {
         "PUT",
 
         Uri.parse(
-          "${Api.baseUrl}/reports/$reportId",
+          "${Api.cloudUrl}/reports/$reportId",
         ),
       );
 
