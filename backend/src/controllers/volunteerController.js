@@ -1,10 +1,27 @@
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { pool, query } = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 
+const normalizeNullable = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  return value;
+};
+
+const generateRandomPassword = (length = 10) => {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#';
+  const bytes = crypto.randomBytes(length);
+
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join('');
+};
+
 const createVolunteer = asyncHandler(async (req, res) => {
   const {
-    user_id = null,
     full_name,
+    email,
     phone = null,
     address = null,
     skills = null,
@@ -13,35 +30,112 @@ const createVolunteer = asyncHandler(async (req, res) => {
     longitude = null
   } = req.body;
 
-  if (!full_name) {
+  if (!full_name || !email) {
     return res.status(400).json({
       success: false,
-      message: 'Nama relawan wajib diisi'
+      message: 'Nama relawan dan email wajib diisi'
     });
   }
 
-  const result = await query(
-    `INSERT INTO volunteers
-     (user_id, full_name, phone, address, skills, availability_status, latitude, longitude)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [user_id, full_name, phone, address, skills, availability_status, latitude, longitude]
+  const cleanEmail = String(email).trim().toLowerCase();
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Format email tidak valid'
+    });
+  }
+
+  const allowedStatuses = ['available', 'assigned', 'unavailable'];
+  const cleanStatus = allowedStatuses.includes(availability_status)
+    ? availability_status
+    : 'available';
+
+  const existingUser = await query(
+    'SELECT id FROM users WHERE email = ?',
+    [cleanEmail]
   );
 
-  res.status(201).json({
-    success: true,
-    message: 'Relawan berhasil ditambahkan',
-    data: {
-      id: result.insertId,
-      user_id,
-      full_name,
-      phone,
-      address,
-      skills,
-      availability_status,
-      latitude,
-      longitude
+  if (existingUser.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email sudah digunakan oleh user lain'
+    });
+  }
+
+  const defaultPassword = generateRandomPassword(10);
+  const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const [userResult] = await connection.execute(
+      `INSERT INTO users
+       (name, email, password, role, phone)
+       VALUES (?, ?, ?, ?, ?)`,
+      [full_name, cleanEmail, hashedPassword, 'volunteer', normalizeNullable(phone)]
+    );
+
+    const [volunteerResult] = await connection.execute(
+      `INSERT INTO volunteers
+       (user_id, full_name, phone, address, skills, availability_status, latitude, longitude)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        userResult.insertId,
+        full_name,
+        normalizeNullable(phone),
+        normalizeNullable(address),
+        normalizeNullable(skills),
+        cleanStatus,
+        normalizeNullable(latitude),
+        normalizeNullable(longitude)
+      ]
+    );
+
+    await connection.commit();
+
+    res.status(201).json({
+      success: true,
+      message: 'Relawan dan akun user berhasil ditambahkan',
+      data: {
+        volunteer: {
+          id: volunteerResult.insertId,
+          user_id: userResult.insertId,
+          full_name,
+          phone: normalizeNullable(phone),
+          address: normalizeNullable(address),
+          skills: normalizeNullable(skills),
+          availability_status: cleanStatus,
+          latitude: normalizeNullable(latitude),
+          longitude: normalizeNullable(longitude)
+        },
+        user: {
+          id: userResult.insertId,
+          name: full_name,
+          email: cleanEmail,
+          role: 'volunteer',
+          phone: normalizeNullable(phone)
+        },
+        default_password: defaultPassword
+      }
+    });
+  } catch (error) {
+    await connection.rollback();
+
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({
+        success: false,
+        message: 'Email atau data relawan sudah digunakan'
+      });
     }
-  });
+
+    throw error;
+  } finally {
+    connection.release();
+  }
 });
 
 const getVolunteers = asyncHandler(async (req, res) => {
@@ -188,22 +282,60 @@ const getStatusLogs = asyncHandler(async (req, res) => {
 });
 
 const deleteVolunteer = asyncHandler(async (req, res) => {
-  const result = await query(
-    'DELETE FROM volunteers WHERE id = ?',
-    [req.params.id]
-  );
+  const connection = await pool.getConnection();
 
-  if (result.affectedRows === 0) {
-    return res.status(404).json({
-      success: false,
-      message: 'Relawan tidak ditemukan'
+  try {
+    await connection.beginTransaction();
+
+    const [rows] = await connection.execute(
+      'SELECT user_id FROM volunteers WHERE id = ?',
+      [req.params.id]
+    );
+
+    if (rows.length === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        success: false,
+        message: 'Relawan tidak ditemukan'
+      });
+    }
+
+    const userId = rows[0].user_id;
+
+    const [deleteVolunteerResult] = await connection.execute(
+      'DELETE FROM volunteers WHERE id = ?',
+      [req.params.id]
+    );
+
+    if (deleteVolunteerResult.affectedRows === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        success: false,
+        message: 'Relawan tidak ditemukan'
+      });
+    }
+
+    if (userId) {
+      await connection.execute(
+        'DELETE FROM users WHERE id = ? AND role = ?',
+        [userId, 'volunteer']
+      );
+    }
+
+    await connection.commit();
+
+    res.json({
+      success: true,
+      message: 'Relawan dan akun user berhasil dihapus'
     });
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
   }
-
-  res.json({
-    success: true,
-    message: 'Relawan berhasil dihapus'
-  });
 });
 
 module.exports = {
