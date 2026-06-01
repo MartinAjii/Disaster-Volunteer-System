@@ -70,33 +70,6 @@ const createReport =
         'Uploaded URL:',
         finalPhotoUrl
       );
-
-      console.log(
-        'Original file size:',
-        req.file.size,
-        'bytes'
-      );
-
-      console.log(
-        'Base64 size:',
-        finalPhotoUrl.length,
-        'bytes'
-      );
-
-      console.log(
-        'MIME type:',
-        mimeType
-      );
-
-      console.log(
-        'Base64 preview:',
-        finalPhotoUrl.substring(0, 50),
-        '...'
-      );
-
-      console.log(
-        '==================='
-      );
     }
 
     const result =
