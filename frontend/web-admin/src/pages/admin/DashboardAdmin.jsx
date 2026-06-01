@@ -212,13 +212,14 @@ const DashboardAdmin = () => {
   // ─────────────────────────────
   // DELETE VOLUNTEER
   // ─────────────────────────────
-  const handleDeleteVolunteer = async (id) => {
+  const handleDeleteVolunteer = async (volunteer) => {
+    const volunteerId = volunteer?.id || volunteer;
     const confirmDelete = window.confirm("Yakin ingin menghapus volunteer ini?");
 
     if (!confirmDelete) return;
 
     try {
-      await deleteData(`${VOLUNTEERS_URL}/${id}`);
+      await deleteData(`${VOLUNTEERS_URL}/${volunteerId}`);
       fetchData();
     } catch (err) {
       alert(err.message);
@@ -410,6 +411,13 @@ const DashboardAdmin = () => {
             label: "Nama Lengkap",
           },
           {
+            key: "email",
+            label: "Email Login",
+            type: "email",
+            placeholder: "volunteer@email.com",
+            helper: "Role akan otomatis menjadi volunteer. Password dibuat otomatis oleh sistem.",
+          },
+          {
             key: "phone",
             label: "Nomor Telepon",
             required: false,
@@ -436,9 +444,18 @@ const DashboardAdmin = () => {
           },
         ],
         onSubmit: async (form) => {
-          await postData(VOLUNTEERS_URL, form);
+          const result = await postData(VOLUNTEERS_URL, form);
+          const account = result.data?.user;
+          const defaultPassword = result.data?.default_password;
+
           setModal(null);
           fetchData();
+
+          if (account && defaultPassword) {
+            window.alert(
+              `Akun volunteer berhasil dibuat.\n\nEmail: ${account.email}\nPassword default: ${defaultPassword}\nRole: ${account.role}\n\nSimpan/catat password ini karena hanya ditampilkan sekali.`
+            );
+          }
         },
       },
 
