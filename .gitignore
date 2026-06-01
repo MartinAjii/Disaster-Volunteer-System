@@ -12,3 +12,8 @@ backend/firebase-service-account.json
 # Frontend
 frontend/node_modules/
 frontend/dist/
+
+.vscode/
+**/.dart_tool/
+**/.gradle/
+**/.kotlin/
