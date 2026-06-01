@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import './assignment_screen.dart';
 import './disaster_screen.dart';
 import './profile_screen.dart';
-import './map_screen.dart';
+import 'realtime_map_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
 
@@ -22,7 +22,7 @@ class _DashboardScreenState
   final pages = [
     const DisasterScreen(),
     const AssignmentScreen(),
-    const MapScreen(),
+    const RealtimeMapScreen(),
     const ProfileScreen(),
   ];
 

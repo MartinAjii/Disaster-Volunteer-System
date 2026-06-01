@@ -1,10 +1,6 @@
 import 'dart:convert';
-
-import 'package:http/http.dart'
-    as http;
-
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../constants/api.dart';
 
 class DisasterService {
@@ -31,7 +27,7 @@ class DisasterService {
           await http.get(
 
         Uri.parse(
-          "${Api.baseUrl}/disasters",
+          "${Api.cloudUrl}/disasters",
         ),
 
         headers: {
